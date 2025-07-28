@@ -1,0 +1,30 @@
+require("dotenv").config();
+const express = require("express");
+const models = require("./models");
+
+const app = express();
+
+// 미들웨어 설정
+app.use(express.json());
+
+// 서버 구동 테스트
+app.get("/", (req, res) => {
+  res.send("hello savee api");
+});
+
+// 서버 실행
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`${PORT}번 포트에서 서버 실행 중`);
+
+  models.sequelize
+    .sync({ force: false })
+    .then(() => {
+      console.log(`db connect`);
+    })
+    .catch((err) => {
+      console.log(`db error: ${err}`);
+      process.exit();
+    });
+});
