@@ -71,6 +71,7 @@ const deletePost = async (req, res) => {
 module.exports = {
   createPost,
   findAllPost,
+  findPostByName,
   updatePost,
   deletePost,
 };
