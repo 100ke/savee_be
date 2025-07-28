@@ -1,4 +1,42 @@
 module.exports = (sequelize, DataTypes) => {
-  const Budget = sequelize.define("Budget", {}, { tableName: "budgets" });
+  const Budget = sequelize.define(
+    "Budget",
+    {
+      ledger_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      year: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      month: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      category_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      limit_amount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+    },
+    { tableName: "budgets" }
+  );
+
+  Budget.assoicate = function (models) {
+    Budget.belongsTo(models.Ledger, {
+      foreignKey: "ledgerId",
+      as: "ledger_budgets",
+    });
+
+    Budget.belongsTo(models.Category, {
+      foreignKey: "ledgerId",
+      as: "ledger_budgets",
+    });
+  };
+
   return Budget;
 };
