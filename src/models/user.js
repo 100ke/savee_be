@@ -8,5 +8,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     { tableName: "users" }
   );
+  User.associate = function (models) {
+    User.hasMany(models.SupportPost, {
+      foreignKey: "userId",
+      as: "posts",
+    });
+  };
   return User;
 };
