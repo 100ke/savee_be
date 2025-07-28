@@ -3,6 +3,7 @@ const express = require("express");
 const models = require("./models");
 
 const authRouter = require("./routes/auth");
+const userRouter = require("./routes/user");
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 // 서버 실행
 const PORT = process.env.PORT || 3000;
 
