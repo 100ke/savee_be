@@ -20,8 +20,8 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function (models) {
     User.hasMany(models.EmailVerification, {
       foreignKey: "userId",
+    });
 
-  User.associate = function (models) {
     User.hasMany(models.Ledger, {
       foreignKey: "userId",
       as: "user_ledgers",
