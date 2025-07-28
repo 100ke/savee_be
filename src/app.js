@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const models = require("./models");
 
+const authRouter = require("./routes/auth");
+
 const app = express();
 
 // 미들웨어 설정
@@ -12,6 +14,7 @@ app.get("/", (req, res) => {
   res.send("hello savee api");
 });
 
+app.use("/auth", authRouter);
 // 서버 실행
 const PORT = process.env.PORT || 3000;
 
