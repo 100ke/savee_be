@@ -18,6 +18,12 @@ module.exports = (sequelize, DataTypes) => {
     { tableName: "users" }
   );
   User.associate = function (models) {
+
+    User.hasMany(models.SupportPost, {
+      foreignKey: "userId",
+      as: "posts",
+    });
+
     User.hasMany(models.EmailVerification, {
       foreignKey: "userId",
     });
@@ -45,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.InviteCode, {
       foreignKey: "userId",
       as: "user_invitecodes",
+
     });
   };
   return User;
