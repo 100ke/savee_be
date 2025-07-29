@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
-      user_id: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -53,6 +53,11 @@ module.exports = (sequelize, DataTypes) => {
     Ledger.hasMany(models.InviteCode, {
       foreignKey: "ledgerId",
       as: "ledger_invitecodes",
+    });
+
+    Ledger.hasMany(models.Goal, {
+      foreignKey: "ledgerId",
+      as: "ledger_goals",
     });
   };
   return Ledger;

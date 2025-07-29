@@ -2,19 +2,11 @@ module.exports = (sequelize, DataTypes) => {
   const Budget = sequelize.define(
     "Budget",
     {
-      ledger_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       year: {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
       month: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      category_id: {
         type: DataTypes.INTEGER,
         allowNull: true,
       },

@@ -2,14 +2,6 @@ module.exports = (sequelize, DataTypes) => {
   const Transaction = sequelize.define(
     "Transaction",
     {
-      ledger_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      category_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       type: {
         type: DataTypes.ENUM("income", "expense"),
         defaultValue: "expense",
