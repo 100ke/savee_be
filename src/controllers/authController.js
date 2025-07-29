@@ -24,7 +24,18 @@ const login = async (req, res) => {
   }
 };
 
+const logout = async (req, res) => {
+  // token = req.headers.authorization.split(" ")[1];
+  const accessToken = req.headers.authorization?.split(" ")[1];
+  if (!accessToken) {
+    return res.status(400).json({ error: "토큰이 없습니다." });
+  }
+  await authService.logout(accessToken);
+  res.status(200).json({ message: "로그아웃 되었습니다." });
+};
+
 module.exports = {
   signup,
   login,
+  logout,
 };

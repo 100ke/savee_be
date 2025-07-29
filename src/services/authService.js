@@ -1,6 +1,7 @@
 const models = require("../models");
 const bcrypt = require("bcrypt");
-const { generateAccessToken } = require("../utils/token");
+const { generateAccessToken, getTokenExpiration } = require("../utils/token");
+const redisClient = require("../utils/redisClient");
 
 const signup = async (email, name, password, code) => {
   try {
@@ -45,7 +46,19 @@ const login = async (email, password) => {
   };
 };
 
+const logout = async (accessToken) => {
+  // 1. accessToken 에서 만료 시간 추출
+  const exp = getTokenExpiration(accessToken);
+  // 현재 시각
+  const now = Math.floor(Date.now() / 1000);
+  // 만료까지 남은 시간 계산
+  const ttl = exp - now;
+  // 2. Redis에서 블랙리스트로 저장 (EX: 몇 초 후 만료)
+  await redisClient.set(`blacklist:${accessToken}`, "blacklisted", { EX: ttl });
+};
+
 module.exports = {
   signup,
   login,
+  logout,
 };
