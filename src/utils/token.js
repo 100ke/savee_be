@@ -6,10 +6,16 @@ const generateAccessToken = (user) => {
     {
       id: user.id,
       email: user.email,
+      role: user.role,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
 };
 
-module.exports = { generateAccessToken };
+const getTokenExpiration = (token) => {
+  const decoded = jwt.decode(token);
+  return decoded?.exp;
+};
+
+module.exports = { generateAccessToken, getTokenExpiration };
