@@ -1,25 +1,115 @@
 const models = require("../models");
 
-const createLedger = async (res, name, userId) => {
+const createLedger = async (name, is_shared, userId) => {
   try {
-    // 로그인된 회원인지 확인
-    const user = await models.User.findByPk({
-      where: { id: userId },
-    });
+    // 로그인한 사용자가 맞는지 검증
+    const user = await models.User.findByPk(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "로그인이 필요합니다." });
+      return { status: 404, message: "로그인이 필요합니다." };
     }
 
     const ledger = await models.Ledger.create({
       name: name,
-      user_id: userId,
+      is_shared: is_shared,
+      userId: userId,
     });
 
-    res.status(201).json({ message: "OK", data: ledger });
+    return { message: "가계부가 만들어졌습니다.", data: ledger };
   } catch (error) {
-    const status = error.status || 500;
-    const message = error.message || "가계부를 만드는 중 문제가 발생했습니다.";
-    res.status(status).json({ error: message });
+    throw error;
   }
+};
+
+const updateLedger = async (userId, name, ledgerId) => {
+  try {
+    // 가계부가 있는지 검증
+    const ledger = await models.Ledger.findOne({
+      where: { id: ledgerId },
+    });
+
+    if (!ledger) {
+      return { message: "가계부를 찾을 수 없습니다." };
+    }
+
+    // 가계부를 소유한 사용자가 맞는지 검증 후 수정
+    if (ledger.userId == userId) {
+      if (ledger) {
+        if (name) ledger.name = name;
+      }
+    } else {
+      return { message: "가계부에 접근할 권한이 없습니다." };
+    }
+
+    await ledger.save();
+    return { message: "가계부 정보를 수정했습니다.", data: ledger };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getLedgers = async (userId) => {
+  try {
+    const ledgers = await models.Ledger.findAll({
+      where: { userId },
+    });
+
+    if (!ledgers) {
+      return { message: "가계부를 찾을 수 없습니다." };
+    }
+
+    return { message: "가계부 목록을 가져왔습니다.", data: ledgers };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteLedger = async (userId, ledgerId) => {
+  try {
+    const ledger = await models.Ledger.findOne({
+      where: { id: ledgerId },
+    });
+
+    if (!ledger) {
+      return { message: "가계부를 찾을 수 없습니다." };
+    }
+
+    if (ledger.userId == userId) {
+      await ledger.destroy();
+    } else {
+      return { message: "가계부에 접근할 권한이 없습니다." };
+    }
+
+    return { message: "가계부가 삭제되었습니다." };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const findLedger = async (userId, ledgerId) => {
+  try {
+    const ledger = await models.Ledger.findOne({
+      where: { id: ledgerId },
+    });
+
+    if (!ledger) {
+      return { status: 404, message: "가계부를 찾을 수 없습니다." };
+    }
+
+    if (ledger.userId == userId) {
+      return { message: "가계부를 가져왔습니다.", data: ledger };
+    } else {
+      return { status: 404, message: "가계부에 접근할 권한이 없습니다." };
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = {
+  createLedger,
+  updateLedger,
+  getLedgers,
+  deleteLedger,
+  findLedger,
 };
