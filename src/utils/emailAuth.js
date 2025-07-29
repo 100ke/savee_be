@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 const generateCode = () => {
-  return Math.floor(Math.random() * 900000 + 100000).toString;
+  return Math.floor(Math.random() * 900000 + 100000).toString();
 };
 
 const sendMail = async (toEmail, code) => {
