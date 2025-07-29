@@ -6,10 +6,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      type: {
-        type: DataTypes.ENUM("income", "expense"),
-        allowNull: false,
-      },
       icon_url: {
         type: DataTypes.TEXT,
       },

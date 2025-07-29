@@ -4,6 +4,7 @@ const models = require("./models");
 
 const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
+const ledgerRouter = require("./routes/ledger");
 const postRouter = require("./routes/support");
 
 const app = express();
@@ -18,7 +19,9 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
+app.use("/ledgers", ledgerRouter);
 app.use("/support", postRouter);
+
 // 서버 실행
 const PORT = process.env.PORT || 3000;
 
