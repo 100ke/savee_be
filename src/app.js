@@ -7,6 +7,9 @@ const userRouter = require("./routes/user");
 const ledgerRouter = require("./routes/ledger");
 const postRouter = require("./routes/support");
 
+const { sequelize } = require("./models");
+const { seedCategories } = require("./utils/seed");
+
 const app = express();
 
 // 미들웨어 설정
@@ -31,6 +34,7 @@ app.listen(PORT, () => {
   models.sequelize
     .sync({ force: false })
     .then(() => {
+      seedCategories();
       console.log(`db connect`);
     })
     .catch((err) => {
