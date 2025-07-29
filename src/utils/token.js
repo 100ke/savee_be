@@ -13,4 +13,9 @@ const generateAccessToken = (user) => {
   );
 };
 
-module.exports = { generateAccessToken };
+const getTokenExpiration = (token) => {
+  const decoded = jwt.decode(token);
+  return decoded?.exp;
+};
+
+module.exports = { generateAccessToken, getTokenExpiration };
