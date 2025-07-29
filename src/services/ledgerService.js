@@ -6,7 +6,7 @@ const createLedger = async (name, is_shared, userId) => {
     const user = await models.User.findByPk(userId);
 
     if (!user) {
-      return { status: 404, message: "로그인이 필요합니다." };
+      return { message: "로그인이 필요합니다." };
     }
 
     const ledger = await models.Ledger.create({
