@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 //게시글 추가(only admin)
 const createPost = async (req, res) => {
   const { title, content, post_type } = req.body;
-  const supportPost = await models.SupoportPost.create({
+  const supportPost = await models.SupportPost.create({
     title,
     content,
     post_type,
@@ -17,17 +17,17 @@ const createPost = async (req, res) => {
 
 //게시글 전체 조회
 const findAllPost = async (req, res) => {
-  const posts = await models.SupoportPost.findAll();
+  const posts = await models.SupportPost.findAll();
   res
     .status(200)
-    .json({ message: "전체 게시글 목록을 조회 합니다.", data: products });
+    .json({ message: "전체 게시글 목록을 조회 합니다.", data: posts });
 };
 
 //게시글 수정(only admin)
 const updatePost = async (req, res) => {
   const { title, content, post_type } = req.body;
   const id = req.params.id;
-  const post = await models.SupoportPost.findByPk(id);
+  const post = await models.SupportPost.findByPk(id);
   if (post) {
     if (title) post.title = title;
     if (content) post.content = content;
@@ -44,7 +44,7 @@ const updatePost = async (req, res) => {
 //게시글 제목 조회
 const findPostByName = async (req, res) => {
   const keyword = req.params.keyword;
-  const posts = await models.SupoportPost.findAll({
+  const posts = await models.SupportPost.findAll({
     where: {
       title: {
         [Op.like]: `%${keyword}%`,
@@ -61,7 +61,7 @@ const findPostByName = async (req, res) => {
 //게시글 삭제(only admin)
 const deletePost = async (req, res) => {
   const id = req.params.id;
-  const result = await models.post.destroy({ where: { id: id } });
+  const result = await models.SupportPost.destroy({ where: { id: id } });
   if (result) {
     res.status(200).json({ message: "게시글이 삭제되었습니다." });
   } else {

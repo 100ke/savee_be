@@ -4,14 +4,6 @@ module.exports = (sequelize, DataTypes) => {
   const LedgerMember = sequelize.define(
     "LedgerMember",
     {
-      ledger_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       role: {
         type: DataTypes.ENUM("owner", "member"),
         allowNull: false,

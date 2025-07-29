@@ -2,14 +2,6 @@ module.exports = (sequelize, DataTypes) => {
   const AnalysisResult = sequelize.define(
     "AnalysisResult",
     {
-      ledger_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
       comment_datesummary: {
         type: DataTypes.TEXT,
         allowNull: false,
