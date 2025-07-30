@@ -15,4 +15,17 @@ router.put(
 );
 router.put("/name", authenticate, checkBlacklist, userController.changeName);
 
+router.post(
+  "/password/send",
+  authenticate,
+  checkBlacklist,
+  userController.sendPasswordResetEmail
+);
+router.post(
+  "/password/reset",
+  authenticate,
+  checkBlacklist,
+  userController.findPassword
+);
+
 module.exports = router;
