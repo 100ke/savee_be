@@ -8,7 +8,7 @@ const createPost = async (req, res) => {
     title,
     content,
     post_type,
-    authorId: req.user.id,
+    userId: req.user.id,
   });
   res
     .status(201)

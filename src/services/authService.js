@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { generateAccessToken, getTokenExpiration } = require("../utils/token");
 const redisClient = require("../utils/redisClient");
 const { generateCode, sendMail } = require("../utils/emailAuth");
+const { Op } = require("sequelize");
 
 // 회원가입을 위한 인증번호 이메일 발송
 const verifyEmail = async (email) => {
@@ -15,6 +16,17 @@ const verifyEmail = async (email) => {
     throw error;
   }
   // 만료 전인 이전 인증번호 무효화 처리 필요
+  await models.EmailVerification.update(
+    { isUsed: true },
+    {
+      where: {
+        email,
+        isUsed: false,
+        expiresAt: { [Op.gt]: new Date() }, // Sequelize에서 조건문(where절) WHERE expiresAt > NOW()의 역할
+        // Op.gt : greater than (>)
+      },
+    }
+  );
 
   // 새 인증번호 생성 및 저장
   const code = generateCode();
@@ -24,7 +36,11 @@ const verifyEmail = async (email) => {
     code,
     expiresAt,
   });
-  await sendMail(email, code);
+  await sendMail({
+    toEmail: email,
+    type: "signup",
+    payload: { code, toEmail: email },
+  });
   return {
     message: "이메일이 전송되었습니다.",
     expiresAt: emailVerification.expiresAt,
@@ -36,6 +52,7 @@ const verifyEmail = async (email) => {
 const verifyCode = async (email, enteredCode) => {
   const verifyInfo = await models.EmailVerification.findOne({
     where: { email: email },
+    order: [["createdAt", "DESC"]],
   });
   if (!verifyInfo) {
     const error = new Error("인증 요청이 없습니다.");
@@ -70,6 +87,7 @@ const signup = async (email, name, password) => {
     // 이메일 인증 정보 먼저 확인
     const verifyInfo = await models.EmailVerification.findOne({
       where: { email: email },
+      order: [["createdAt", "DESC"]],
     });
     if (!verifyInfo || !verifyInfo.isUsed) {
       const error = new Error("이메일 인증이 필요합니다.");
