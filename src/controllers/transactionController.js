@@ -3,7 +3,7 @@ const transactionService = require("../services/transactionService");
 
 // 수입 / 지출 입력
 const addTransactions = async (req, res) => {
-  const { type, amount, memo, categoryId } = req.body;
+  const { type, amount, memo, categoryId, date } = req.body;
   const ledgerId = req.params.ledgerId;
   const userId = req.user.id;
 
@@ -14,7 +14,8 @@ const addTransactions = async (req, res) => {
       categoryId,
       type,
       amount,
-      memo
+      memo,
+      date
     );
     res.status(201).json(result);
   } catch (error) {
@@ -51,6 +52,7 @@ const findTransaction = async (req, res) => {
       ledgerId,
       transactionId
     );
+
     res.status(200).json(result);
   } catch (error) {
     const status = error.status || 500;
@@ -102,10 +104,51 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
+// 일일 가계부 내역
+const getMonthlyTransactions = async (req, res) => {
+  const userId = req.user.id;
+  const ledgerId = req.params.ledgerId;
+  let month = req.query.month;
+
+  try {
+    const result = await transactionService.getMonthlyTransactions(
+      userId,
+      ledgerId,
+      month
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "일일 가계부를 불러오지 못했습니다.";
+    res.status(status).json(message);
+  }
+};
+
+const getWeeklyTransactions = async (req, res) => {
+  const userId = req.user.id;
+  const ledgerId = req.params.ledgerId;
+  let month = req.query.month;
+
+  try {
+    const result = await transactionService.getWeeklyTransactions(
+      userId,
+      ledgerId,
+      month
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "주간 가계부를 불러오지 못했습니다.";
+    res.status(status).json(message);
+  }
+};
+
 module.exports = {
   addTransactions,
   getTransactions,
   findTransaction,
   updateTransaction,
   deleteTransaction,
+  getMonthlyTransactions,
+  getWeeklyTransactions,
 };
