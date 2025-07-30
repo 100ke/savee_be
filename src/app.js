@@ -6,6 +6,10 @@ const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const ledgerRouter = require("./routes/ledger");
 const postRouter = require("./routes/support");
+const transactionRouter = require("./routes/transaction");
+
+const { sequelize } = require("./models");
+const { seedCategories } = require("./utils/seed");
 
 const app = express();
 
@@ -21,6 +25,7 @@ app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/ledgers", ledgerRouter);
 app.use("/support", postRouter);
+app.use("/ledgers/:ledgerId/transactions");
 
 // 서버 실행
 const PORT = process.env.PORT || 3000;
@@ -31,6 +36,7 @@ app.listen(PORT, () => {
   models.sequelize
     .sync({ force: false })
     .then(() => {
+      seedCategories();
       console.log(`db connect`);
     })
     .catch((err) => {
