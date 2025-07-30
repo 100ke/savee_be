@@ -14,6 +14,9 @@ const verifyEmail = async (email) => {
     error.status = 409;
     throw error;
   }
+  // 만료 전인 이전 인증번호 무효화 처리 필요
+
+  // 새 인증번호 생성 및 저장
   const code = generateCode();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후
   const emailVerification = await models.EmailVerification.create({
@@ -22,7 +25,11 @@ const verifyEmail = async (email) => {
     expiresAt,
   });
   await sendMail(email, code);
-  return { message: "이메일이 전송되었습니다.", emailVerification };
+  return {
+    message: "이메일이 전송되었습니다.",
+    expiresAt: emailVerification.expiresAt,
+    email: emailVerification.email,
+  };
 };
 
 // 인증 번호 확인
@@ -30,7 +37,13 @@ const verifyCode = async (email, enteredCode) => {
   const verifyInfo = await models.EmailVerification.findOne({
     where: { email: email },
   });
-  if (!verifyInfo.code == enteredCode) {
+  if (!verifyInfo) {
+    const error = new Error("인증 요청이 없습니다.");
+    error.status = 400;
+    throw error;
+  }
+
+  if (verifyInfo.code !== enteredCode) {
     const error = new Error("인증번호가 일치하지 않습니다.");
     error.status = 401;
     throw error;
@@ -54,28 +67,27 @@ const verifyCode = async (email, enteredCode) => {
 
 const signup = async (email, name, password) => {
   try {
+    // 이메일 인증 정보 먼저 확인
+    const verifyInfo = await models.EmailVerification.findOne({
+      where: { email: email },
+    });
+    if (!verifyInfo || !verifyInfo.isUsed) {
+      const error = new Error("이메일 인증이 필요합니다.");
+      error.status = 403;
+      throw error;
+    }
     const hashedPw = await bcrypt.hash(password, 10);
     const user = await models.User.create({
       email: email,
       name: name,
       password: hashedPw,
     });
-    // 이메일 인증로직 추가
-    const verifyInfo = await models.EmailVerification.findOne({
-      where: { email: email },
-    });
-    if (!verifyInfo.isUsed) {
-      const error = new Error("이메일 인증이 필요합니다.");
-      error.status = 403;
-      throw error;
-    }
     return {
       message: `${user.name}님 회원가입에 성공했습니다.`,
       user: { id: user.id, email },
     };
   } catch (error) {
-    // error.status = 500;
-    // throw error;
+    throw error;
   }
 };
 
