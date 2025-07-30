@@ -56,9 +56,23 @@ const findPassword = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { email, password } = req.body;
+    const result = await userService.deleteUser(userId, email, password);
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "회원 탈퇴 중 오류가 발생했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
 module.exports = {
   changePassword,
   changeName,
   sendPasswordResetEmail,
   findPassword,
+  deleteUser,
 };
