@@ -8,6 +8,6 @@ router.post("/", authenticate, postController.createPost);
 router.put("/:id", authenticate, postController.updatePost);
 router.delete("/:id", authenticate, postController.deletePost);
 
-router.get("/", postController.findAllPost);
-router.get("/:keyword", postController.findPostByName);
+router.get("/", authenticate,postController.findAllPost);
+router.get("/:keyword", authenticate,postController.findPostByName);
 module.exports = router;

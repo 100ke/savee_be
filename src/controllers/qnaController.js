@@ -26,6 +26,11 @@ const updateQna = async (req, res) => {
   const { title, question, qna_type } = req.body;
   const id = req.params.id;
   const qna = await models.Qna.findByPk(id);
+  const userId= req.user.id;
+  // 작성자 본인인지 확인
+  if (qna.userId !== userId) {
+    return res.status(403).json({ message: "작성자만 수정할 수 있습니다." });
+  }
   if (qna) {
     if (title) qna.title = title;
     if (question) qna.question = question;
