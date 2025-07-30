@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "notice",
         allowNull: false,
       },
+      fileName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     { tableName: "support_posts" }
   );
