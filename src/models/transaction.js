@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
       memo: {
         type: DataTypes.TEXT,
       },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
     },
     { tableName: "transactions" }
   );

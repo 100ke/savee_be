@@ -25,7 +25,7 @@ app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/ledgers", ledgerRouter);
 app.use("/support", postRouter);
-app.use("/ledgers/:ledgerId/transactions");
+app.use("/ledgers/:ledgerId/transactions", transactionRouter);
 
 // 서버 실행
 const PORT = process.env.PORT || 3000;
