@@ -9,7 +9,7 @@ const postRouter = require("./routes/support");
 const transactionRouter = require("./routes/transaction");
 
 const { sequelize } = require("./models");
-const { seedCategories } = require("./utils/seed");
+const { seedCategories, seedUsers } = require("./utils/seed");
 
 const app = express();
 
@@ -37,6 +37,7 @@ app.listen(PORT, () => {
     .sync({ force: false })
     .then(() => {
       seedCategories();
+      seedUsers();
       console.log(`db connect`);
     })
     .catch((err) => {
