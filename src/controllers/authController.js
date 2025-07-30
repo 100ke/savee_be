@@ -1,7 +1,43 @@
 const authService = require("../services/authService");
 
+const sendVerificationCode = async (req, res) => {
+  const email = req.body.email;
+  if (!email) {
+    return res.status(400).json({ error: "이메일을 입력하세요." });
+  }
+  try {
+    const result = await authService.verifyEmail(email);
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "인증번호 발송 중 오류 발생";
+    res.status(status).json({ error: message });
+  }
+};
+
+const confirmCode = async (req, res) => {
+  const { email, code } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "이메일을 입력하세요." });
+  }
+  if (!code) {
+    return res.status(400).json({ error: "인증번호를 입력하세요." });
+  }
+  try {
+    const result = await authService.verifyCode(email, code);
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "인증번호 확인 중 오류 발생";
+    res.status(status).json({ error: message });
+  }
+};
+
 const signup = async (req, res) => {
   const { email, name, password } = req.body;
+  if (!email || !name || !password) {
+    return res.status(400).json({ error: "모든 정보를 입력해주세요." });
+  }
   try {
     const result = await authService.signup(email, name, password);
     res.status(201).json(result);
@@ -35,6 +71,8 @@ const logout = async (req, res) => {
 };
 
 module.exports = {
+  sendVerificationCode,
+  confirmCode,
   signup,
   login,
   logout,
