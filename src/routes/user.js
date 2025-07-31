@@ -27,5 +27,6 @@ router.post(
   checkBlacklist,
   userController.findPassword
 );
+router.delete("/", authenticate, checkBlacklist, userController.deleteUser);
 
 module.exports = router;

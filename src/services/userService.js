@@ -103,4 +103,36 @@ const findPassword = async (name, email) => {
   };
 };
 
-module.exports = { changePassword, changeName, sendPasswordCode, findPassword };
+const deleteUser = async (userId, enteredEmail, enteredPassword) => {
+  const user = await models.User.findByPk(userId);
+  if (!user) {
+    const error = new Error("회원 정보를 찾을 수 없습니다.");
+    error.status = 404;
+    throw error;
+  }
+  if (user.email !== enteredEmail) {
+    const error = new Error(
+      "입력한 이메일이 현재 로그인된 계정과 일치하지 않습니다."
+    );
+    error.status = 403;
+    throw error;
+  }
+  const isMatch = await bcrypt.compare(enteredPassword, user.password);
+  if (!isMatch) {
+    const error = new Error("비밀번호가 일치하지 않습니다.");
+    error.status = 401;
+    throw error;
+  }
+  await models.User.destroy({
+    where: { id: userId },
+  });
+  return { message: "정상적으로 탈퇴되었습니다." };
+};
+
+module.exports = {
+  changePassword,
+  changeName,
+  sendPasswordCode,
+  findPassword,
+  deleteUser,
+};
