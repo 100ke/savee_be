@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middlewares/authMiddleware");
 const { adminOnly } = require("../middlewares/adminMiddleware");
-const postController = require("../controllers/postController");
+const qnaController = require("../controllers/qnaController");
 
-router.post("/", authenticate, postController.createPost);
-router.put("/:id", authenticate, postController.updatePost);
-router.delete("/:id", authenticate, postController.deletePost);
+router.post("/", authenticate, qnaController.createQna);
+router.put("/:id", authenticate, qnaController.updateQna);
+router.delete("/:id", authenticate, qnaController.deleteQna);
 
-router.get("/", authenticate,postController.findAllPost);
-router.get("/:keyword", authenticate,postController.findPostByName);
+router.get("/", authenticate, qnaController.findAllQna);
+router.get("/search", authenticate, qnaController.findQnaByName);
 module.exports = router;

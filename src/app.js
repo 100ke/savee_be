@@ -7,6 +7,7 @@ const userRouter = require("./routes/user");
 const ledgerRouter = require("./routes/ledger");
 const postRouter = require("./routes/support");
 const transactionRouter = require("./routes/transaction");
+const qnaRouter = require("./routes/qna");
 
 const { sequelize } = require("./models");
 const { seedCategories, seedUsers } = require("./utils/seed");
@@ -24,8 +25,9 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/ledgers", ledgerRouter);
-app.use("/support", postRouter);
 app.use("/ledgers/:ledgerId/transactions", transactionRouter);
+app.use("/support", postRouter);
+app.use("/qna", qnaRouter);
 
 // 서버 실행
 const PORT = process.env.PORT || 3000;

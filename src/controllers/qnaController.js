@@ -26,7 +26,7 @@ const updateQna = async (req, res) => {
   const { title, question, qna_type } = req.body;
   const id = req.params.id;
   const qna = await models.Qna.findByPk(id);
-  const userId= req.user.id;
+  const userId = req.user.id;
   // 작성자 본인인지 확인
   if (qna.userId !== userId) {
     return res.status(403).json({ message: "작성자만 수정할 수 있습니다." });
@@ -44,25 +44,29 @@ const updateQna = async (req, res) => {
 
 //질문 제목 조회
 const findQnaByName = async (req, res) => {
-  const keyword = req.params.keyword;
-  const qnas = await models.SupportQna.findAll({
+  const title = req.query.title;
+  const qnas = await models.Qna.findAll({
     where: {
       title: {
-        [Op.like]: `%${keyword}%`,
+        [Op.iLike]: `%${title}%`, //대소문자 무시
       },
     },
   });
-  if (qnas) {
-    res.status(200).json({ message: "질문 검색 결과 입니다.", data: qnas });
-  } else {
-    res.status(500).json({ message: "질문이 없습니다.", error });
+  if (!qnas || qnas.length === 0) {
+    return res.status(200).json({ message: "검색 결과가 없습니다.", data: [] });
   }
+  res.status(404).json({ message: "질문이 없습니다.", error });
 };
 
 //질문 삭제(only 작성자, admin)
 const deleteQna = async (req, res) => {
   const id = req.params.id;
-  const result = await models.SupportQna.destroy({ where: { id: id } });
+  const qna = await models.Qna.findByPk(id);
+  if (qna.userId != id) {
+    return res.status(403).json({ message: "작성자만 삭제 할 수 있습니다." });
+  }
+  const result = await models.Qna.destroy({ where: { id: id } });
+
   if (result) {
     res.status(200).json({ message: "질문이 삭제되었습니다." });
   } else {

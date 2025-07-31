@@ -18,10 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     { tableName: "users" }
   );
   User.associate = function (models) {
-
     User.hasMany(models.SupportPost, {
       foreignKey: "userId",
-      as: "posts",
+      as: "user_posts",
     });
 
     User.hasMany(models.EmailVerification, {
@@ -51,7 +50,10 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.InviteCode, {
       foreignKey: "userId",
       as: "user_invitecodes",
-
+    });
+    User.hasMany(models.Qna, {
+      foreignKey: "userId",
+      as: "user_Qnas",
     });
   };
   return User;
