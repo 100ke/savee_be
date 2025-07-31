@@ -11,34 +11,19 @@ const addTransactions = async (
   date
 ) => {
   try {
-    // 로그인한 사용자가 맞는지 검증
-    const user = await models.User.findByPk(userId);
+    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
+    if (!success) return { message };
 
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
-    }
+    const transac = await models.Transaction.create({
+      type,
+      amount,
+      memo,
+      categoryId,
+      ledgerId,
+      date,
+    });
 
-    // 가계부가 있는지 검증
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (ledger.userId == userId && ledger.id == ledgerId) {
-      const transac = await models.Transaction.create({
-        type,
-        amount,
-        memo,
-        categoryId,
-        ledgerId,
-        date,
-      });
-
-      return { message: "수입/지출 입력이 완료되었습니다.", data: transac };
-    } else {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    return { message: "수입/지출 입력이 완료되었습니다.", data: transac };
   } catch (error) {
     throw error;
   }
@@ -46,29 +31,16 @@ const addTransactions = async (
 
 const getTransactions = async (userId, ledgerId) => {
   try {
-    const user = await models.User.findByPk(userId);
+    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
+    if (!success) return { message };
 
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
-    }
+    const transac = await models.Transaction.findAll({
+      where: {
+        ledgerId,
+      },
+    });
 
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (ledger.userId == userId && ledger.id == ledgerId) {
-      const transac = await models.Transaction.findAll({
-        where: {
-          ledgerId,
-        },
-      });
-
-      return { message: "수입/지출 목록을 가져왔습니다.", data: transac };
-    } else {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    return { message: "수입/지출 목록을 가져왔습니다.", data: transac };
   } catch (error) {
     throw error;
   }
@@ -76,29 +48,20 @@ const getTransactions = async (userId, ledgerId) => {
 
 const findTransaction = async (userId, ledgerId, transactionId) => {
   try {
-    const user = await models.User.findByPk(userId);
+    const { success, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId,
+      transactionId
+    );
+    if (!success) return { message };
 
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
+    const transac = await models.Transaction.findByPk(transactionId);
+
+    if (!transac) {
+      return { message: "해당 내역을 찾을 수 없습니다." };
     }
 
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (ledger.id == ledgerId && ledger.userId == userId) {
-      const transac = await models.Transaction.findByPk(transactionId);
-
-      if (!transac) {
-        return { message: "해당 내역을 찾을 수 없습니다." };
-      }
-
-      return { message: "수입/지출 내역을 가져왔습니다.", data: transac };
-    } else {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    return { message: "수입/지출 내역을 가져왔습니다.", data: transac };
   } catch (error) {
     throw error;
   }
@@ -114,33 +77,24 @@ const updateTransaction = async (
   memo
 ) => {
   try {
-    const user = await models.User.findByPk(userId);
+    const { success, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId,
+      transactionId
+    );
+    if (!success) return { message };
 
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
+    const transaction = await models.Transaction.findByPk(transactionId);
+
+    if (transaction) {
+      if (categoryId) transaction.categoryId = categoryId;
+      if (type) transaction.type = type;
+      if (amount) transaction.amount = amount;
+      if (memo) transaction.memo = memo;
     }
 
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (ledger.id == ledgerId && ledger.userId == userId) {
-      const transaction = await models.Transaction.findByPk(transactionId);
-
-      if (transaction) {
-        if (categoryId) transaction.categoryId = categoryId;
-        if (type) transaction.type = type;
-        if (amount) transaction.amount = amount;
-        if (memo) transaction.memo = memo;
-      }
-
-      await transaction.save();
-      return { message: "수입/지출 내역을 수정했습니다.", data: transaction };
-    } else {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    await transaction.save();
+    return { message: "수입/지출 내역을 수정했습니다.", data: transaction };
   } catch (error) {
     throw error;
   }
@@ -148,31 +102,22 @@ const updateTransaction = async (
 
 const deleteTransaction = async (userId, ledgerId, transactionId) => {
   try {
-    const user = await models.User.findByPk(userId);
+    const { success, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId,
+      transactionId
+    );
+    if (!success) return { message };
 
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
-    }
+    await models.Transaction.destroy({ where: { id: transactionId } });
 
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (ledger.id == ledgerId && ledger.userId == userId) {
-      await models.Transaction.destroy({ where: { id: transactionId } });
-
-      return { message: "수입/지출 내역이 삭제되었습니다." };
-    } else {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    return { message: "수입/지출 내역이 삭제되었습니다." };
   } catch (error) {
     throw error;
   }
 };
 
-const getMonthlyTransactions = async (userId, ledgerId, month) => {
+const getDailyTransactions = async (userId, ledgerId, month) => {
   try {
     // 값을 입력하지 않았을 때 현재 월로 설정
     if (!month) {
@@ -183,21 +128,8 @@ const getMonthlyTransactions = async (userId, ledgerId, month) => {
       month = `${yyyy}-${mm}`;
     }
 
-    const user = await models.User.findByPk(userId);
-
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
-    }
-
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (!ledger || ledger.userId !== userId) {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
+    if (!success) return { message };
 
     const [year, mm] = month.split("-");
     const yearInt = parseInt(year, 10);
@@ -220,6 +152,10 @@ const getMonthlyTransactions = async (userId, ledgerId, month) => {
         ["createdAt", "ASC"],
       ],
     });
+
+    if (transactions.length === 0) {
+      return { message: "해당 월에 입력한 내역이 없습니다." };
+    }
 
     let totalIncome = 0;
     let totalExpense = 0;
@@ -248,21 +184,8 @@ const getWeeklyTransactions = async (userId, ledgerId, month) => {
       month = `${yyyy}-${mm}`;
     }
 
-    const user = await models.User.findByPk(userId);
-
-    if (!user) {
-      return { message: "사용자 정보를 확인할 수 없습니다." };
-    }
-
-    const ledger = await models.Ledger.findByPk(ledgerId);
-
-    if (!ledger) {
-      return { message: "해당 가계부를 찾을 수 없습니다." };
-    }
-
-    if (!ledger || ledger.userId !== userId) {
-      return { message: "가계부에 접근할 권한이 없습니다." };
-    }
+    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
+    if (!success) return { message };
 
     // 마지막날 계산
     const [year, mm] = month.split("-");
@@ -327,12 +250,111 @@ const getWeeklyTransactions = async (userId, ledgerId, month) => {
   }
 };
 
+const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
+  try {
+    // 값을 입력하지 않았을 때 현재 월로 설정
+    if (!month) {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      month = `${yyyy}-${mm}`;
+    }
+
+    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
+    if (!success) return { message };
+
+    const [year, mm] = month.split("-");
+    const yearInt = parseInt(year, 10);
+    const monthInt = parseInt(mm, 10);
+
+    const lastDay = new Date(yearInt, monthInt, 0).getDate();
+
+    // 일별 내역 결과를 저장할 배열
+    const daily = [];
+
+    for (let day = 1; day <= lastDay; day++) {
+      // 1일부터 시작 31일까지 출력,
+      // monthInt는 0-base이기 때문에 이전 달의 마지막 날이 나오므로 day에 +1을 해서 이번달 첫날로 지정
+      const currentDate = new Date(yearInt, monthInt - 1, day + 1);
+      // YYYY-MM-DD
+      const formattedDate = currentDate.toISOString().split("T")[0];
+
+      const transactions = await models.Transaction.findAll({
+        where: {
+          ledgerId,
+          date: formattedDate,
+        },
+        order: [["createdAt", "ASC"]],
+      });
+
+      // 총 수입/지출 금액
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      transactions.forEach((trs) => {
+        if (trs.type === "income") totalIncome += trs.amount;
+        if (trs.type === "expense") totalExpense += trs.amount;
+      });
+
+      daily.push({
+        date: formattedDate,
+        totalIncome,
+        totalExpense,
+        transactions,
+      });
+    }
+
+    return { message: `${month} 월간 가계부`, data: daily };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const vaildateUserAndLedger = async (userId, ledgerId, transactionId) => {
+  const user = await models.User.findByPk(userId);
+
+  // 로그인한 사용자가 맞는지 권한 검증
+  if (!user) {
+    return { success: false, message: "사용자 정보를 확인할 수 없습니다." };
+  }
+
+  // 해당 가계부가 맞는지 권한 검증
+  const ledger = await models.Ledger.findByPk(ledgerId);
+
+  if (!ledger) {
+    return { success: false, message: "해당 가계부를 찾을 수 없습니다." };
+  }
+
+  // 둘 중 하나라도 권한이 없으면 가계부에 접근 못 하도록 설정
+  if (!ledger || ledger.userId !== userId) {
+    return { success: false, message: "가계부에 접근할 권한이 없습니다." };
+  }
+
+  // 해당 트랜잭션이 가계부에 속하는지 확인
+  if (transactionId) {
+    const transaction = await models.Transaction.findByPk(transactionId);
+    if (!transaction) {
+      return { success: false, message: "해당 내역을 찾을 수 없습니다." };
+    }
+
+    if (transaction.ledgerId !== Number(ledgerId)) {
+      return {
+        success: false,
+        message: "해당 내역을 가계부에서 찾을 수 없습니다.",
+      };
+    }
+  }
+
+  return { success: true, user, ledger };
+};
+
 module.exports = {
   addTransactions,
   getTransactions,
   findTransaction,
   updateTransaction,
   deleteTransaction,
-  getMonthlyTransactions,
+  getDailyTransactions,
   getWeeklyTransactions,
+  getMonthlyCalendarTransactions,
 };
