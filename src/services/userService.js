@@ -1,6 +1,5 @@
 const models = require("../models");
 const bcrypt = require("bcrypt");
-const authService = require("../services/authService");
 const {
   generateCode,
   sendMail,
