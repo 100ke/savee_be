@@ -105,13 +105,13 @@ const deleteTransaction = async (req, res) => {
 };
 
 // 일일 가계부 내역
-const getMonthlyTransactions = async (req, res) => {
+const getDailyTransactions = async (req, res) => {
   const userId = req.user.id;
   const ledgerId = req.params.ledgerId;
   let month = req.query.month;
 
   try {
-    const result = await transactionService.getMonthlyTransactions(
+    const result = await transactionService.getDailyTransactions(
       userId,
       ledgerId,
       month
@@ -143,12 +143,32 @@ const getWeeklyTransactions = async (req, res) => {
   }
 };
 
+const getMonthlyCalendarTransactions = async (req, res) => {
+  const userId = req.user.id;
+  const ledgerId = req.params.ledgerId;
+  let month;
+
+  try {
+    const result = await transactionService.getMonthlyCalendarTransactions(
+      userId,
+      ledgerId,
+      month
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "월간 가계부를 불러오지 못했습니다.";
+    res.status(status).json(message);
+  }
+};
+
 module.exports = {
   addTransactions,
   getTransactions,
   findTransaction,
   updateTransaction,
   deleteTransaction,
-  getMonthlyTransactions,
+  getDailyTransactions,
   getWeeklyTransactions,
+  getMonthlyCalendarTransactions,
 };
