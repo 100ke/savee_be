@@ -10,4 +10,6 @@ router.delete("/:id", authenticate, qnaController.deleteQna);
 
 router.get("/", authenticate, qnaController.findAllQna);
 router.get("/search", authenticate, qnaController.findQnaByName);
+
+router.patch("/:id/answer",authenticate,adminOnly,qnaController.updateAnswer)
 module.exports = router;

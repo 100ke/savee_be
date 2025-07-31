@@ -73,10 +73,25 @@ const deleteQna = async (req, res) => {
     res.status(404).json({ message: "질문이 없습니다." });
   }
 };
+
+const updateAnswer = async (req, res) => {
+  const { answer } = req.body;
+  const id = req.params.id;
+  const qna = await models.Qna.findByPk(id);
+  if (qna) {
+    if (answer) qna.answer = answer;
+    await qna.save();
+    res.status(200).json({ message: "답변이 등록되었습니다.", data: qna });
+  } else {
+    res.status(404).json({ message: "질문이 없습니다." });
+  }
+};
+
 module.exports = {
   createQna,
   findAllQna,
   findQnaByName,
   updateQna,
   deleteQna,
+  updateAnswer
 };
