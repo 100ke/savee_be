@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      answer: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
       qna_type: {
         type: DataTypes.ENUM(
           "login",
