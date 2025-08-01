@@ -1,4 +1,4 @@
-const { ENUM } = require("sequelize");
+const { ENUM, Association } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   const Qna = sequelize.define(
@@ -36,5 +36,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     { tableName: "qna" }
   );
+  Qna.associate = function (models) {
+    Qna.belongsTo(models.User, {
+      foreignKey: "userId",
+      as: "user",
+    });
+  };
   return Qna;
 };

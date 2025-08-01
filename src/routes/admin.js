@@ -10,8 +10,8 @@ router.use(adminOnly);
 
 // 관리자 - 회원 관리
 router.post("/users", adminController.createUser);
-// router.get("/users", adminOnly, userController)
-// router.patch("/users/:userId", adminOnly, userController)
-// router.delete("/users/:userId", adminOnly, userController)
+router.get("/users", adminController.getAllUsers);
+router.patch("/users/:id", adminController.updateUser);
+router.delete("/users/:id", adminController.deleteUser);
 
 module.exports = router;
