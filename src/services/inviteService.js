@@ -1,4 +1,5 @@
 const models = require("../models");
+const { generateInviteCode, sendMail } = require("../utils/emailAuth");
 
 const createInviteAndSend = async (email, ledgerId, ownerId) => {
   const user = await models.User.findByPk(ownerId);
@@ -51,7 +52,7 @@ const createInviteAndSend = async (email, ledgerId, ownerId) => {
 
 // 초대 수락
 const acceptInvite = async (code, email, memberId) => {
-  const invite = await models.InviteCode.findOne({ where: code });
+  const invite = await models.InviteCode.findOne({ where: { code } });
 
   // 초대 코드 유효성
   if (!invite) {
@@ -72,13 +73,13 @@ const acceptInvite = async (code, email, memberId) => {
   if (invite.invitedEmail !== email) {
     return {
       status: 404,
-      message: "초대 이베일과 로그인 이메일이 일치하지 않습니다.",
+      message: "초대 이메일과 로그인 이메일이 일치하지 않습니다.",
     };
   }
 
   // 이미 멤버인지 확인
   const existingMember = await models.LedgerMember.findOne({
-    where: { ledgerId: invite.ledgerId, memberId },
+    where: { ledgerId: invite.ledgerId, userId: memberId },
   });
 
   if (existingMember) {
@@ -88,7 +89,7 @@ const acceptInvite = async (code, email, memberId) => {
   // 멤버 생성
   await models.LedgerMember.create({
     ledgerId: invite.ledgerId,
-    memberId,
+    userId: memberId,
     role: "member",
   });
 

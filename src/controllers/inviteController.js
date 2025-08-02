@@ -2,8 +2,8 @@ const models = require("../models");
 const inviteService = require("../services/inviteService");
 
 const createInvites = async (req, res) => {
-  const email = req.body;
-  const ledgerId = req.params.ledgerId;
+  const { email } = req.body;
+  const ledgerId = parseInt(req.params.ledgerId, 10);
   const ownerId = req.user.id;
 
   try {

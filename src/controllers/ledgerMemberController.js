@@ -1,10 +1,7 @@
 const models = require("../models");
 const ledgerMemberService = require("../services/ledgerMemberService");
 
-// 초대 코드 발송
-
-// 멤버 생성
-const addMembers = async (req, res) => {};
+// 멤버 생성은 이메일을 통해 초대 코드로 인증하므로 inviteController로 분리
 
 // 멤버 목록 조회
 const getMembers = async (req, res) => {};
