@@ -61,6 +61,10 @@ const findByid = async (req, res) => {
 //질문 제목 조회
 const findBytitle = async (req, res) => {
   const title = req.query.title;
+  if (!title || title.trim() === "") {
+    return res.status(400).json({ message: "검색어는 필수입니다." });
+  }
+
   const qnas = await models.Qna.findAll({
     where: {
       title: {
@@ -68,6 +72,7 @@ const findBytitle = async (req, res) => {
       },
     },
   });
+
   if (!qnas || qnas.length === 0) {
     return res.status(200).json({ message: "검색 결과가 없습니다.", data: [] });
   }
