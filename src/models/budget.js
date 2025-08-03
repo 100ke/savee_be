@@ -14,19 +14,27 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      ledgerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     { tableName: "budgets" }
   );
 
-  Budget.assoicate = function (models) {
+  Budget.associate = function (models) {
     Budget.belongsTo(models.Ledger, {
       foreignKey: "ledgerId",
       as: "ledger_budgets",
     });
 
     Budget.belongsTo(models.Category, {
-      foreignKey: "ledgerId",
-      as: "ledger_budgets",
+      foreignKey: "categoryId",
+      as: "category_budgets",
     });
   };
 
