@@ -14,6 +14,10 @@ const createInviteAndSend = async (email, ledgerId, ownerId) => {
     return { status: 404, message: "해당 가계부를 찾을 수 없습니다." };
   }
 
+  if (!ledger.is_shared) {
+    return { status: 404, message: "공유 가계부가 아닙니다." };
+  }
+
   // 중복되지 않는 초대 코드 생성
   let code;
   let exists;
