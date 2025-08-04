@@ -43,6 +43,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "ledgerId",
       as: "ledger_goals",
     });
+
+    Goal.belongsTo(models.Category, {
+      foreignKey: "categoryId",
+      as: "category_goals",
+    });
   };
 
   return Goal;

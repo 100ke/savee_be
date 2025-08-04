@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: "owner",
       },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      ledgerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     { tableName: "ledger_members" }
   );

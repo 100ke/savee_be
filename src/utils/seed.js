@@ -42,6 +42,13 @@ const seedUsers = async () => {
       password: "1234",
       role: "admin",
     },
+    {
+      id: 3,
+      name: "user2",
+      email: "user2@example.com",
+      password: "123456",
+      role: "user",
+    },
   ];
 
   for (const user of users) {
