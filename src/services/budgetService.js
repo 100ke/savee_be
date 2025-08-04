@@ -44,7 +44,7 @@ const addBudgets = async (
 
     return {
       status: 200,
-      message: `${result.name} 카테고리에 예산이 설정되었습니다.`,
+      message: `${result.category_budgets.name} 카테고리에 예산이 설정되었습니다.`,
       data: result,
     };
   } catch (error) {
@@ -62,7 +62,7 @@ const getBudgets = async (userId, ledgerId) => {
     if (!success) return { status, message };
 
     const budgets = await models.Budget.findAll({
-      where: { userId, ledgerId },
+      where: { ledgerId },
       include: [
         {
           model: models.Category,
@@ -93,7 +93,7 @@ const findBudget = async (userId, ledgerId, budgetId) => {
     if (!success) return { status, message };
 
     const budget = await models.Budget.findOne({
-      where: { ledgerId, userId, id: budgetId },
+      where: { ledgerId, id: budgetId },
       include: [
         {
           model: models.Category,
@@ -102,10 +102,10 @@ const findBudget = async (userId, ledgerId, budgetId) => {
         },
       ],
     });
-
+    console.log(budget);
     return {
       status: 200,
-      message: `${budget.name} 카테고리의 예산을 가져왔습니다.`,
+      message: `${budget.category_budgets.name} 카테고리의 예산을 가져왔습니다.`,
       data: budget,
     };
   } catch (error) {
@@ -133,7 +133,7 @@ const updateBudget = async (
     if (!success) return { status, message };
 
     const newBudget = await models.Budget.findOne({
-      where: { ledgerId, userId, id: budgetId },
+      where: { ledgerId, id: budgetId },
       include: [
         {
           model: models.Category,
@@ -154,7 +154,8 @@ const updateBudget = async (
 
     return {
       status: 200,
-      message: `${newBudget.name} 카테고리의 예산이 수정되었습니다.`,
+      message: `${newBudget.category_budgets.name} 카테고리의 예산이 수정되었습니다.`,
+      data: newBudget,
     };
   } catch (error) {
     throw error;
@@ -172,7 +173,7 @@ const deleteBudget = async (userId, ledgerId, budgetId) => {
     if (!success) return { status, message };
 
     const budget = await models.Budget.findOne({
-      where: { ledgerId, userId, id: budgetId },
+      where: { ledgerId, id: budgetId },
       include: [
         {
           model: models.Category,
@@ -188,7 +189,7 @@ const deleteBudget = async (userId, ledgerId, budgetId) => {
 
     return {
       status: 200,
-      message: `${budget.name} 카테고리의 에산을 삭제했습니다.`,
+      message: `${budget.category_budgets.name} 카테고리의 에산을 삭제했습니다.`,
     };
   } catch (error) {
     throw error;

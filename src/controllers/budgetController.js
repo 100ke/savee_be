@@ -48,7 +48,7 @@ const getBudgets = async (req, res) => {
 // 예산 상세 조회
 const findBudget = async (req, res) => {
   const userId = req.user.id;
-  const { ledgerId, budgetId } = req.params.ledgerId;
+  const { ledgerId, budgetId } = req.params;
 
   try {
     const result = await budgetService.findBudget(userId, ledgerId, budgetId);
@@ -65,7 +65,7 @@ const findBudget = async (req, res) => {
 // 예산 수정
 const updateBudget = async (req, res) => {
   const userId = req.user.id;
-  const { ledgerId, budgetId } = req.params.ledgerId;
+  const { ledgerId, budgetId } = req.params;
   const { year, month, limit_amount, categoryId } = req.body;
 
   try {
@@ -91,7 +91,7 @@ const updateBudget = async (req, res) => {
 // 예산 삭제
 const deleteBudget = async (req, res) => {
   const userId = req.user.id;
-  const { ledgerId, budgetId } = req.params.ledgerId;
+  const { ledgerId, budgetId } = req.params;
 
   try {
     const result = await budgetService.deleteBudget(userId, ledgerId, budgetId);
