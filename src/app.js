@@ -13,6 +13,7 @@ const inviteRouter = require("./routes/invite");
 const ledgerMemberRouter = require("./routes/ledgerMember");
 const budgetRouter = require("./routes/budget");
 const answerRouter = require("./routes/answer");
+const commentRouter = require("./routes/comment");
 
 const { sequelize } = require("./models");
 const { seedCategories, seedUsers } = require("./utils/seed");
@@ -38,6 +39,7 @@ app.use("/invites", inviteRouter);
 app.use("/ledgers/:ledgerId/members", ledgerMemberRouter);
 app.use("/ledgers/:ledgerId/budgets", budgetRouter);
 app.use("/answer", answerRouter);
+app.use("/ledgers/:ledgerId/comments", commentRouter);
 
 // 서버 실행
 const PORT = process.env.PORT || 3000;

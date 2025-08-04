@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       comment_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
       },
       userId: {
@@ -23,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "comments",
       indexes: [
         {
+          // 한 유저가 한 날짜에 하나의 댓글만 작성, 다른 유저는 작성 가능
           unique: true,
+          // ledgerId + comment_date + userId 의 조합이 중복되면 안됨
           fields: ["ledgerId", "comment_date", "userId"],
         },
       ],

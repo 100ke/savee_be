@@ -21,6 +21,7 @@ const addTransactions = async (
       categoryId,
       ledgerId,
       date,
+      userId,
     });
 
     return { message: "수입/지출 입력이 완료되었습니다.", data: transac };
