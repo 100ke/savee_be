@@ -18,6 +18,16 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "categoryId",
       as: "category_transactions",
     });
+
+    Category.hasMany(models.Budget, {
+      foreignKey: "categoryId",
+      as: "category_budgets",
+    });
+
+    Category.hasMany(models.Goal, {
+      foreignKey: "categoryId",
+      as: "category_goals",
+    });
   };
 
   return Category;
