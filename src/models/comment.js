@@ -2,16 +2,32 @@ module.exports = (sequelize, DataTypes) => {
   const Comment = sequelize.define(
     "Comment",
     {
-      comment_date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
       content: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      comment_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      ledgerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
-    { tableName: "comments" }
+    {
+      tableName: "comments",
+      indexes: [
+        {
+          unique: true,
+          fields: ["ledgerId", "comment_date", "userId"],
+        },
+      ],
+    }
   );
 
   Comment.associate = function (models) {
