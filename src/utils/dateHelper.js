@@ -1,0 +1,52 @@
+import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
+import isoWeekday from "dayjs/plugin/isoWeekday";
+
+dayjs.extend(isoWeek);
+dayjs.extend(isoWeekday);
+
+// const now = dayjs(); // 현재 시간
+// const today = now.format("YYYY-MM-DD"); // 오늘 날짜
+const year = dayjs().year(); // 올해
+const month = dayjs().month() + 1; // 이번 달 (월은 0부터 시작)
+const week = dayjs().isoWeek(); // 올해에서 이번 주의 주차
+
+const getCurrentMonthInfo = () => {
+  return { year: year, month: month };
+};
+
+const getCurrentWeekInfo = () => {
+  return { year: year, week: week };
+};
+
+const getDateRange = (type, year, monthOrWeek) => {
+  switch (type) {
+    case "weekly":
+      const startOfWeek = dayjs()
+        .year(year)
+        .isoWeek(monthOrWeek)
+        .isoWeekday(1)
+        .format("YYYY-MM-DD");
+      const endOfWeek = dayjs()
+        .year(year)
+        .isoWeek(monthOrWeek)
+        .isoWeekday(7)
+        .format("YYYY-MM-DD");
+      return { start: startOfWeek, end: endOfWeek };
+
+    case "monthly":
+      const startOfMonth = dayjs(`${year}-${monthOrWeek}-01`)
+        .startOf("month")
+        .format("YYYY-MM-DD");
+      const endOfMonth = dayjs(`${year}-${monthOrWeek}-01`)
+        .endOf("month")
+        .format("YYYY-MM-DD");
+      return { start: startOfMonth, end: endOfMonth };
+  }
+};
+
+module.exports = {
+  getCurrentMonthInfo,
+  getCurrentWeekInfo,
+  getDateRange,
+};
