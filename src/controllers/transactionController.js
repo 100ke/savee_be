@@ -17,7 +17,9 @@ const addTransactions = async (req, res) => {
       memo,
       date
     );
-    res.status(201).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "수입/지출 내역을 저장하지 못헀습니다.";
@@ -32,7 +34,9 @@ const getTransactions = async (req, res) => {
 
   try {
     const result = await transactionService.getTransactions(userId, ledgerId);
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message =
@@ -53,7 +57,9 @@ const findTransaction = async (req, res) => {
       transactionId
     );
 
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "수입/지출 내역을 불러오지 못헀습니다.";
@@ -77,7 +83,9 @@ const updateTransaction = async (req, res) => {
       amount,
       memo
     );
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "수입/지출 내역을 수정하지 못했습니다.";
@@ -96,7 +104,9 @@ const deleteTransaction = async (req, res) => {
       ledgerId,
       transactionId
     );
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "수입/지출 내역을 삭제하지 못헀습니다.";
@@ -116,7 +126,9 @@ const getDailyTransactions = async (req, res) => {
       ledgerId,
       month
     );
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "일일 가계부를 불러오지 못했습니다.";
@@ -135,7 +147,9 @@ const getWeeklyTransactions = async (req, res) => {
       ledgerId,
       month
     );
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "주간 가계부를 불러오지 못했습니다.";
@@ -154,7 +168,9 @@ const getMonthlyCalendarTransactions = async (req, res) => {
       ledgerId,
       month
     );
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "월간 가계부를 불러오지 못했습니다.";
