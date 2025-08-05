@@ -1,9 +1,7 @@
-import dayjs from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
-import isoWeekday from "dayjs/plugin/isoWeekday";
+const dayjs = require("dayjs");
+const isoWeek = require("dayjs/plugin/isoWeek");
 
 dayjs.extend(isoWeek);
-dayjs.extend(isoWeekday);
 
 // const now = dayjs(); // 현재 시간
 // const today = now.format("YYYY-MM-DD"); // 오늘 날짜
@@ -25,12 +23,12 @@ const getDateRange = (type, year, monthOrWeek) => {
       const startOfWeek = dayjs()
         .year(year)
         .isoWeek(monthOrWeek)
-        .isoWeekday(1)
+        .startOf("isoWeek")
         .format("YYYY-MM-DD");
       const endOfWeek = dayjs()
         .year(year)
         .isoWeek(monthOrWeek)
-        .isoWeekday(7)
+        .endOf("isoWeek")
         .format("YYYY-MM-DD");
       return { start: startOfWeek, end: endOfWeek };
 
