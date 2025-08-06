@@ -17,10 +17,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       start_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
+        defaultValue: DataTypes.NOW,
       },
       end_date: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
       },
       type: {
         type: DataTypes.ENUM("saving", "spending_cut", "custom"),

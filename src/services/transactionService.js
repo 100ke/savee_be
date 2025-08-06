@@ -11,8 +11,11 @@ const addTransactions = async (
   date
 ) => {
   try {
-    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
-    if (!success) return { message };
+    const { success, status, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId
+    );
+    if (!success) return { status, message };
 
     const transac = await models.Transaction.create({
       type,
@@ -21,9 +24,24 @@ const addTransactions = async (
       categoryId,
       ledgerId,
       date,
+      userId,
     });
 
-    return { message: "수입/지출 입력이 완료되었습니다.", data: transac };
+    const result = await models.Transaction.findByPk(transac.id, {
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
+    });
+
+    return {
+      status: 200,
+      message: "수입/지출 입력이 완료되었습니다.",
+      data: result,
+    };
   } catch (error) {
     throw error;
   }
@@ -31,16 +49,30 @@ const addTransactions = async (
 
 const getTransactions = async (userId, ledgerId) => {
   try {
-    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
-    if (!success) return { message };
+    const { success, status, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId
+    );
+    if (!success) return { status, message };
 
     const transac = await models.Transaction.findAll({
       where: {
         ledgerId,
       },
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
     });
 
-    return { message: "수입/지출 목록을 가져왔습니다.", data: transac };
+    return {
+      status: 200,
+      message: "수입/지출 목록을 가져왔습니다.",
+      data: transac,
+    };
   } catch (error) {
     throw error;
   }
@@ -48,20 +80,32 @@ const getTransactions = async (userId, ledgerId) => {
 
 const findTransaction = async (userId, ledgerId, transactionId) => {
   try {
-    const { success, message } = await vaildateUserAndLedger(
+    const { success, status, message } = await vaildateUserAndLedger(
       userId,
       ledgerId,
       transactionId
     );
-    if (!success) return { message };
+    if (!success) return { status, message };
 
-    const transac = await models.Transaction.findByPk(transactionId);
+    const transac = await models.Transaction.findByPk(transactionId, {
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
+    });
 
     if (!transac) {
-      return { message: "해당 내역을 찾을 수 없습니다." };
+      return { status: 404, message: "해당 내역을 찾을 수 없습니다." };
     }
 
-    return { message: "수입/지출 내역을 가져왔습니다.", data: transac };
+    return {
+      status: 200,
+      message: "수입/지출 내역을 가져왔습니다.",
+      data: transac,
+    };
   } catch (error) {
     throw error;
   }
@@ -77,14 +121,22 @@ const updateTransaction = async (
   memo
 ) => {
   try {
-    const { success, message } = await vaildateUserAndLedger(
+    const { success, status, message } = await vaildateUserAndLedger(
       userId,
       ledgerId,
       transactionId
     );
-    if (!success) return { message };
+    if (!success) return { status, message };
 
-    const transaction = await models.Transaction.findByPk(transactionId);
+    const transaction = await models.Transaction.findByPk(transactionId, {
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
+    });
 
     if (transaction) {
       if (categoryId) transaction.categoryId = categoryId;
@@ -94,7 +146,11 @@ const updateTransaction = async (
     }
 
     await transaction.save();
-    return { message: "수입/지출 내역을 수정했습니다.", data: transaction };
+    return {
+      status: 200,
+      message: "수입/지출 내역을 수정했습니다.",
+      data: transaction,
+    };
   } catch (error) {
     throw error;
   }
@@ -102,16 +158,16 @@ const updateTransaction = async (
 
 const deleteTransaction = async (userId, ledgerId, transactionId) => {
   try {
-    const { success, message } = await vaildateUserAndLedger(
+    const { success, status, message } = await vaildateUserAndLedger(
       userId,
       ledgerId,
       transactionId
     );
-    if (!success) return { message };
+    if (!success) return { status, message };
 
     await models.Transaction.destroy({ where: { id: transactionId } });
 
-    return { message: "수입/지출 내역이 삭제되었습니다." };
+    return { status: 200, message: "수입/지출 내역이 삭제되었습니다." };
   } catch (error) {
     throw error;
   }
@@ -128,8 +184,11 @@ const getDailyTransactions = async (userId, ledgerId, month) => {
       month = `${yyyy}-${mm}`;
     }
 
-    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
-    if (!success) return { message };
+    const { success, status, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId
+    );
+    if (!success) return { status, message };
 
     const [year, mm] = month.split("-");
     const yearInt = parseInt(year, 10);
@@ -151,10 +210,17 @@ const getDailyTransactions = async (userId, ledgerId, month) => {
         ["date", "ASC"],
         ["createdAt", "ASC"],
       ],
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
     });
 
     if (transactions.length === 0) {
-      return { message: "해당 월에 입력한 내역이 없습니다." };
+      return { status: 404, message: "해당 월에 입력한 내역이 없습니다." };
     }
 
     let totalIncome = 0;
@@ -166,6 +232,7 @@ const getDailyTransactions = async (userId, ledgerId, month) => {
     });
 
     return {
+      status: 200,
       message: `${month}의 거래 내역`,
       data: { transactions, summary: { totalIncome, totalExpense } },
     };
@@ -184,8 +251,11 @@ const getWeeklyTransactions = async (userId, ledgerId, month) => {
       month = `${yyyy}-${mm}`;
     }
 
-    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
-    if (!success) return { message };
+    const { success, status, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId
+    );
+    if (!success) return { status, message };
 
     // 마지막날 계산
     const [year, mm] = month.split("-");
@@ -212,6 +282,13 @@ const getWeeklyTransactions = async (userId, ledgerId, month) => {
             [Op.between]: [startDate, endDate],
           },
         },
+        include: [
+          {
+            model: models.Category,
+            as: "category_transactions",
+            attributes: ["name"],
+          },
+        ],
         order: [
           ["date", "ASC"],
           ["createdAt", "ASC"],
@@ -244,7 +321,7 @@ const getWeeklyTransactions = async (userId, ledgerId, month) => {
       });
     }
 
-    return { message: `${month} 주간 가계부`, data: weeks };
+    return { status: 200, message: `${month} 주간 가계부`, data: weeks };
   } catch (error) {
     throw error;
   }
@@ -260,8 +337,11 @@ const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
       month = `${yyyy}-${mm}`;
     }
 
-    const { success, message } = await vaildateUserAndLedger(userId, ledgerId);
-    if (!success) return { message };
+    const { success, status, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId
+    );
+    if (!success) return { status, message };
 
     const [year, mm] = month.split("-");
     const yearInt = parseInt(year, 10);
@@ -284,6 +364,13 @@ const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
           ledgerId,
           date: formattedDate,
         },
+        include: [
+          {
+            model: models.Category,
+            as: "category_transactions",
+            attributes: ["name"],
+          },
+        ],
         order: [["createdAt", "ASC"]],
       });
 
@@ -304,7 +391,7 @@ const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
       });
     }
 
-    return { message: `${month} 월간 가계부`, data: daily };
+    return { status: 200, message: `${month} 월간 가계부`, data: daily };
   } catch (error) {
     throw error;
   }
@@ -315,26 +402,42 @@ const vaildateUserAndLedger = async (userId, ledgerId, transactionId) => {
 
   // 로그인한 사용자가 맞는지 권한 검증
   if (!user) {
-    return { success: false, message: "사용자 정보를 확인할 수 없습니다." };
+    return {
+      success: false,
+      status: 404,
+      message: "사용자 정보를 확인할 수 없습니다.",
+    };
   }
 
   // 해당 가계부가 맞는지 권한 검증
   const ledger = await models.Ledger.findByPk(ledgerId);
 
   if (!ledger) {
-    return { success: false, message: "해당 가계부를 찾을 수 없습니다." };
+    return {
+      success: false,
+      status: 404,
+      message: "해당 가계부를 찾을 수 없습니다.",
+    };
   }
 
   // 둘 중 하나라도 권한이 없으면 가계부에 접근 못 하도록 설정
   if (!ledger || ledger.userId !== userId) {
-    return { success: false, message: "가계부에 접근할 권한이 없습니다." };
+    return {
+      success: false,
+      status: 404,
+      message: "가계부에 접근할 권한이 없습니다.",
+    };
   }
 
   // 해당 트랜잭션이 가계부에 속하는지 확인
   if (transactionId) {
     const transaction = await models.Transaction.findByPk(transactionId);
     if (!transaction) {
-      return { success: false, message: "해당 내역을 찾을 수 없습니다." };
+      return {
+        success: false,
+        status: 404,
+        message: "해당 내역을 찾을 수 없습니다.",
+      };
     }
 
     if (transaction.ledgerId !== Number(ledgerId)) {
@@ -345,7 +448,7 @@ const vaildateUserAndLedger = async (userId, ledgerId, transactionId) => {
     }
   }
 
-  return { success: true, user, ledger };
+  return { success: true, status: 200, user, ledger };
 };
 
 module.exports = {

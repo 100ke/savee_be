@@ -13,9 +13,16 @@ const inviteRouter = require("./routes/invite");
 const ledgerMemberRouter = require("./routes/ledgerMember");
 const budgetRouter = require("./routes/budget");
 const answerRouter = require("./routes/answer");
+const commentRouter = require("./routes/comment");
+const goalRouter = require("./routes/goal");
+const statsRouter = require("./routes/statistic");
 
 const { sequelize } = require("./models");
-const { seedCategories, seedUsers } = require("./utils/seed");
+const {
+  seedCategories,
+  seedUsers,
+  seedLedgerAndTransactions,
+} = require("./utils/seed");
 
 const app = express();
 
@@ -38,6 +45,9 @@ app.use("/invites", inviteRouter);
 app.use("/ledgers/:ledgerId/members", ledgerMemberRouter);
 app.use("/ledgers/:ledgerId/budgets", budgetRouter);
 app.use("/answer", answerRouter);
+app.use("/ledgers/:ledgerId/comments", commentRouter);
+app.use("/ledgers/:ledgerId/goals", goalRouter);
+app.use("/statistics", statsRouter);
 
 // 서버 실행
 const PORT = process.env.PORT || 3000;
@@ -46,10 +56,11 @@ app.listen(PORT, () => {
   console.log(`${PORT}번 포트에서 서버 실행 중`);
 
   models.sequelize
-    .sync({ force: false })
-    .then(() => {
-      seedCategories();
-      seedUsers();
+    .sync({ force: true })
+    .then(async () => {
+      await seedCategories();
+      await seedUsers();
+      await seedLedgerAndTransactions();
       console.log(`db connect`);
     })
     .catch((err) => {

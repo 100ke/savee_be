@@ -8,7 +8,9 @@ const createLedger = async (req, res) => {
 
   try {
     const result = await ledgerService.createLedger(name, is_shared, userId);
-    res.status(201).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "가계부를 만드는 중 문제가 발생했습니다.";
@@ -24,7 +26,9 @@ const updateLedger = async (req, res) => {
 
   try {
     const result = await ledgerService.updateLedger(userId, name, ledgerId);
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "가계부 정보를 수정하지 못했습니다.";
@@ -38,7 +42,9 @@ const getLedgers = async (req, res) => {
 
   try {
     const result = await ledgerService.getLedgers(userId);
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "가계부 목록을 가져오지 못했습니다.";
@@ -53,7 +59,9 @@ const deleteLedger = async (req, res) => {
 
   try {
     const result = await ledgerService.deleteLedger(userId, ledgerId);
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "가계부를 삭제하지 못했습니다.";
@@ -68,7 +76,9 @@ const findLedger = async (req, res) => {
 
   try {
     const result = await ledgerService.findLedger(userId, ledgerId);
-    res.status(200).json(result);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "가계부의 정보를 불러오지 못했습니다.";

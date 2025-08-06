@@ -16,13 +16,6 @@ const addBudgets = async (
       categoryId
     );
     if (!success) return { status, message };
-    console.log("create budget with:", {
-      year,
-      month,
-      limit_amount,
-      categoryId,
-      ledgerId,
-    });
 
     const budget = await models.Budget.create({
       year,
@@ -102,7 +95,7 @@ const findBudget = async (userId, ledgerId, budgetId) => {
         },
       ],
     });
-    console.log(budget);
+
     return {
       status: 200,
       message: `${budget.category_budgets.name} 카테고리의 예산을 가져왔습니다.`,
