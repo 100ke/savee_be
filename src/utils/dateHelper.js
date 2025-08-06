@@ -58,10 +58,20 @@ const getISOWeeksOfMonth = (year, month) => {
   return weeks;
 };
 
+// 최근 7일 날짜 추출
+const getLast7Days = () => {
+  const last7Days = [];
+  for (let i = 6; i >= 0; i--) {
+    last7Days.push(dayjs().subtract(i, "day").format("YYYY-MM-DD"));
+  }
+  return last7Days;
+};
+
 module.exports = {
   dayjs,
   getCurrentMonthInfo,
   getCurrentWeekInfo,
   getDateRange,
   getISOWeeksOfMonth,
+  getLast7Days,
 };
