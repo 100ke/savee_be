@@ -27,10 +27,20 @@ const addTransactions = async (
       userId,
     });
 
+    const result = await models.Transaction.findByPk(transac.id, {
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
+    });
+
     return {
       status: 200,
       message: "수입/지출 입력이 완료되었습니다.",
-      data: transac,
+      data: result,
     };
   } catch (error) {
     throw error;
@@ -49,6 +59,13 @@ const getTransactions = async (userId, ledgerId) => {
       where: {
         ledgerId,
       },
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
     });
 
     return {
@@ -70,7 +87,15 @@ const findTransaction = async (userId, ledgerId, transactionId) => {
     );
     if (!success) return { status, message };
 
-    const transac = await models.Transaction.findByPk(transactionId);
+    const transac = await models.Transaction.findByPk(transactionId, {
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
+    });
 
     if (!transac) {
       return { status: 404, message: "해당 내역을 찾을 수 없습니다." };
@@ -103,7 +128,15 @@ const updateTransaction = async (
     );
     if (!success) return { status, message };
 
-    const transaction = await models.Transaction.findByPk(transactionId);
+    const transaction = await models.Transaction.findByPk(transactionId, {
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
+    });
 
     if (transaction) {
       if (categoryId) transaction.categoryId = categoryId;
@@ -177,6 +210,13 @@ const getDailyTransactions = async (userId, ledgerId, month) => {
         ["date", "ASC"],
         ["createdAt", "ASC"],
       ],
+      include: [
+        {
+          model: models.Category,
+          as: "category_transactions",
+          attributes: ["name"],
+        },
+      ],
     });
 
     if (transactions.length === 0) {
@@ -242,6 +282,13 @@ const getWeeklyTransactions = async (userId, ledgerId, month) => {
             [Op.between]: [startDate, endDate],
           },
         },
+        include: [
+          {
+            model: models.Category,
+            as: "category_transactions",
+            attributes: ["name"],
+          },
+        ],
         order: [
           ["date", "ASC"],
           ["createdAt", "ASC"],
@@ -317,6 +364,13 @@ const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
           ledgerId,
           date: formattedDate,
         },
+        include: [
+          {
+            model: models.Category,
+            as: "category_transactions",
+            attributes: ["name"],
+          },
+        ],
         order: [["createdAt", "ASC"]],
       });
 
