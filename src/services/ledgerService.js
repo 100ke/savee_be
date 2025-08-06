@@ -139,7 +139,7 @@ const validateUserAndLedger = async (userId, ledgerId) => {
     };
   }
 
-  if (ledgerId !== null) {
+  if (ledgerId !== null && ledgerId !== undefined) {
     const ledger = await models.Ledger.findOne({ where: { id: ledgerId } });
 
     if (!ledger) {
@@ -159,7 +159,7 @@ const validateUserAndLedger = async (userId, ledgerId) => {
     }
   }
 
-  return { success: true, status: 200, user, ledger };
+  return { success: true, status: 200, user };
 };
 
 module.exports = {
