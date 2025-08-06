@@ -43,8 +43,25 @@ const getDateRange = (type, year, monthOrWeek) => {
   }
 };
 
+// 월에 포함된 주차 리스트 추출
+const getISOWeeksOfMonth = (year, month) => {
+  const startOfMonth = dayjs(`${year}-${month}-01`);
+  const endOfMonth = startOfMonth.endOf("month");
+
+  const startWeek = startOfMonth.isoWeek();
+  const endWeek = endOfMonth.isoWeek();
+
+  let weeks = [];
+  for (let w = startWeek; w <= endWeek; w++) {
+    weeks.push(w);
+  }
+  return weeks;
+};
+
 module.exports = {
+  dayjs,
   getCurrentMonthInfo,
   getCurrentWeekInfo,
   getDateRange,
+  getISOWeeksOfMonth,
 };
