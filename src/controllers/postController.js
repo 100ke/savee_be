@@ -17,10 +17,28 @@ const createPost = async (req, res) => {
 
 //게시글 전체 조회
 const findAllPost = async (req, res) => {
-  const posts = await models.SupportPost.findAll();
-  res
-    .status(200)
-    .json({ message: "전체 게시글 목록을 조회 합니다.", data: posts });
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10; // limit
+  const offset = (page - 1) * pageSize;
+
+  const totalPosts = await models.SupportPost.count();
+  const posts = await models.SupportPost.findAll({
+    limit: pageSize,
+    offset: offset,
+  });
+  const totalPages = Math.ceil(totalPosts / pageSize);
+  res.status(200).json({
+    message: "전체 게시글 목록을 조회 합니다.",
+    data: {
+      posts,
+      pagination: {
+        currentPage: page,
+        pageSize,
+        totalItems: totalPosts,
+        totalPages,
+      },
+    },
+  });
 };
 
 //게시글 수정(only admin)
