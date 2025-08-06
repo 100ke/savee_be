@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       post_type: {
-        type: DataTypes.ENUM("notice", "update", "guide"),
-        defaultValue: "notice",
+        type: DataTypes.ENUM("공지", "업데이트", "가이드"),
+        defaultValue: "공지",
         allowNull: false,
       },
       fileName: {
