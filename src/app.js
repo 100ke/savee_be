@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const models = require("./models");
 
 const authRouter = require("./routes/auth");
@@ -25,6 +26,14 @@ const {
 } = require("./utils/seed");
 
 const app = express();
+
+// CORS 설정
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 // 미들웨어 설정
 app.use(express.json());

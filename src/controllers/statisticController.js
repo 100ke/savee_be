@@ -54,8 +54,22 @@ const getWeeklyTotalExpensing = async (req, res) => {
   }
 };
 
+const getLast7DaysExpensing = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await statisticService.getLast7DaysExpensing(userId);
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message =
+      error.message || "최근 7일간 일일 추이 조회 중 오류가 발생했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
 module.exports = {
   getCategoryExpensing,
   getMonthlyTotalExpensing,
   getWeeklyTotalExpensing,
+  getLast7DaysExpensing,
 };

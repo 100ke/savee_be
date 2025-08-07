@@ -1,10 +1,12 @@
 const models = require("../models");
+const { Op } = require("sequelize");
 const {
   getDateRange,
   getCurrentWeekInfo,
   getCurrentMonthInfo,
   getISOWeeksOfMonth,
   dayjs,
+  getLast7Days,
 } = require("../utils/dateHelper");
 const {
   filterByDateRange,
@@ -89,7 +91,7 @@ const getWeeklyTotalExpensing = async (userId, ledgerId) => {
   // 지출 내역에 iso 주차 번호 부여
   const expensesWithWeek = expenses.map((expense) => {
     const week = dayjs(expense.date).isoWeek();
-    return { ...expense, week };
+    return { ...expense.dataValues, week };
   });
 
   // 3. 주차별 데이터 필터링
@@ -105,7 +107,10 @@ const getWeeklyTotalExpensing = async (userId, ledgerId) => {
   // 4. 주차별 총합 계산 -> 지출 내역 없는 주차는 total=0
   const weeklySum = weeksInMonth.map((week) => {
     const transactions = groupByWeek[week] || [];
-    const total = transactions.reduce((sum, t) => sum + t.amount, 0);
+    const total = transactions.reduce(
+      (sum, t) => sum + (Number(t.amount) || 0),
+      0
+    );
     return {
       week,
       total,
@@ -116,9 +121,47 @@ const getWeeklyTotalExpensing = async (userId, ledgerId) => {
 };
 
 // 지출 추이 - 2. 최근 7일의 일일 추이
+const getLast7DaysExpensing = async (userId) => {
+  // 1. 최근 7일에 대한 날짜 산출
+  const period = getLast7Days(); // 배열
+  // 2. 최근 7일에 대한 지출 데이터 조회
+  const expenses = await models.Transaction.findAll({
+    where: {
+      userId,
+      type: "expense",
+      date: { [Op.between]: [period[0], period[6]] },
+    },
+  });
+  // 3. 날짜별 데이터 그룹화 및 합산
+  // 날짜별 합계 초기화
+  const dailyTotals = {};
+  period.forEach((date) => {
+    const formatted = dayjs(date).format("YYYY-MM-DD");
+    dailyTotals[formatted] = 0;
+  });
+
+  expenses.forEach((expense) => {
+    const date = dayjs(expense.date).format("YYYY-MM-DD");
+
+    if (dailyTotals[date] !== undefined) {
+      dailyTotals[date] += expense.amount;
+    }
+  });
+
+  const result = period.map((date) => {
+    const formatted = dayjs(date).format("YYYY-MM-DD");
+    return {
+      date: formatted,
+      total: dailyTotals[formatted],
+    };
+  });
+
+  return result;
+};
 
 module.exports = {
   getCategoryExpensing,
   getMonthlyTotalExpensing,
   getWeeklyTotalExpensing,
+  getLast7DaysExpensing,
 };

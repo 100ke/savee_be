@@ -69,10 +69,23 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getUserInfo = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await userService.getUserInfo(userId);
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "회원 정보 조회 중 오류가 밣생했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
 module.exports = {
   changePassword,
   changeName,
   sendPasswordResetEmail,
   findPassword,
   deleteUser,
+  getUserInfo,
 };
