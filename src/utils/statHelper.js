@@ -15,7 +15,7 @@ const filterByDateRange = (data, start, end) => {
 // 카테고리별로 데이터 그룹화
 const groupByCategory = (data) => {
   return data.reduce((acc, item) => {
-    const category = item.category;
+    const category = item.category_transactions?.name || "기타";
     if (!acc[category]) {
       acc[category] = [];
     }
