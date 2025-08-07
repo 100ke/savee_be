@@ -207,7 +207,7 @@ const getDailyTransactions = async (userId, ledgerId, month) => {
         },
       },
       order: [
-        ["date", "ASC"],
+        ["date", "DESC"],
         ["createdAt", "ASC"],
       ],
       include: [

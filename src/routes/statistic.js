@@ -12,16 +12,23 @@ router.get(
 );
 
 router.get(
-  "/trend/total-month",
+  "/trend/total/monthly",
   authenticate,
   checkPersonalLedger,
   statisticController.getMonthlyTotalExpensing
 );
 router.get(
-  "/trend/total-week",
+  "/trend/total/weekly",
   authenticate,
   checkPersonalLedger,
   statisticController.getWeeklyTotalExpensing
+);
+
+router.get(
+  "/trend/daily",
+  authenticate,
+  checkPersonalLedger,
+  statisticController.getLast7DaysExpensing
 );
 
 module.exports = router;
