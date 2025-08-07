@@ -128,10 +128,21 @@ const deleteUser = async (userId, enteredEmail, enteredPassword) => {
   return { message: "정상적으로 탈퇴되었습니다." };
 };
 
+const getUserInfo = async (userId) => {
+  const user = await models.User.findByPk(userId);
+  if (!user) {
+    const error = new Error("회원 정보를 찾을 수 없습니다.");
+    error.status = 404;
+    throw error;
+  }
+  return { name: user.name, email: user.email };
+};
+
 module.exports = {
   changePassword,
   changeName,
   sendPasswordCode,
   findPassword,
   deleteUser,
+  getUserInfo,
 };
