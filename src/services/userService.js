@@ -15,7 +15,7 @@ const changePassword = async (userId, currentPassword, newPassword) => {
   }
   const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch) {
-    const error = new Error("비밀번호가 일치하지 않습니다.");
+    const error = new Error("기존 비밀번호를 다시 확인해주세요.");
     error.status = 401;
     throw error;
   }
@@ -38,10 +38,10 @@ const changeName = async (userId, name) => {
 };
 
 // 비밀번호 찾기용 인증 메일 발송
-const sendPasswordCode = async (name, email) => {
+const sendPasswordCode = async (email) => {
   // 회원 조회
   const user = await models.User.findOne({
-    where: { name, email },
+    where: { email },
   });
   // 없다면 에러 반환
   if (!user) {
@@ -70,10 +70,10 @@ const sendPasswordCode = async (name, email) => {
   };
 };
 
-const findPassword = async (name, email) => {
+const findPassword = async (email) => {
   // 1. 회원조회
   const user = await models.User.findOne({
-    where: { name, email },
+    where: { email },
   });
   if (!user) {
     const error = new Error("입력한 정보가 일치하지 않습니다.");
@@ -99,6 +99,7 @@ const findPassword = async (name, email) => {
   return {
     message: "비밀번호가 임시 비밀번호로 재설정되었습니다.",
     tempPassword,
+    name: user.name,
   };
 };
 
