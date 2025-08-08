@@ -9,5 +9,6 @@ router.put("/:id", authenticate, adminOnly, postController.updatePost);
 router.delete("/:id", authenticate, adminOnly, postController.deletePost);
 
 router.get("/", postController.findAllPost);
-router.get("/:keyword", postController.findPostByName);
+router.get("/:id", postController.findPostById);
+router.get("/search/:keyword", postController.findPostByName);
 module.exports = router;

@@ -34,8 +34,8 @@ const changeName = async (req, res) => {
 
 const sendPasswordResetEmail = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const result = await userService.sendPasswordCode(name, email);
+    const { email } = req.body;
+    const result = await userService.sendPasswordCode(email);
     res.status(200).json(result);
   } catch (error) {
     const status = error.status || 500;
@@ -46,8 +46,8 @@ const sendPasswordResetEmail = async (req, res) => {
 
 const findPassword = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const result = await userService.findPassword(name, email);
+    const { email } = req.body;
+    const result = await userService.findPassword(email);
     res.status(200).json(result);
   } catch (error) {
     const status = error.status || 500;

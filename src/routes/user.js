@@ -15,18 +15,8 @@ router.put(
 );
 router.put("/name", authenticate, checkBlacklist, userController.changeName);
 
-router.post(
-  "/password/send",
-  authenticate,
-  checkBlacklist,
-  userController.sendPasswordResetEmail
-);
-router.post(
-  "/password/reset",
-  authenticate,
-  checkBlacklist,
-  userController.findPassword
-);
+router.post("/password/send", userController.sendPasswordResetEmail);
+router.post("/password/reset", userController.findPassword);
 router.delete("/", authenticate, checkBlacklist, userController.deleteUser);
 router.get("/me", authenticate, checkBlacklist, userController.getUserInfo);
 
