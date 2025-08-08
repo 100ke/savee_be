@@ -40,6 +40,19 @@ const findAllPost = async (req, res) => {
     },
   });
 };
+//게시글 id로 조회
+const findPostById = async (req, res) => {
+  const id = req.params.id;
+  const post = await models.SupportPost.findByPk(id);
+  if (post) {
+    res.status(200).json({
+      message: "게시글을 불러왔습니다.",
+      data: post,
+    });
+  } else {
+    res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+  }
+};
 
 //게시글 수정(only admin)
 const updatePost = async (req, res) => {
@@ -89,6 +102,7 @@ const deletePost = async (req, res) => {
 module.exports = {
   createPost,
   findAllPost,
+  findPostById,
   findPostByName,
   updatePost,
   deletePost,
