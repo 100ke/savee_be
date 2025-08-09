@@ -32,31 +32,39 @@ const createLedger = async (name, is_shared, userId) => {
     const { success, status, message } = await validateUserAndLedger(userId);
     if (!success) return { status, message };
 
-    // 개인 가계부는 무조건 하나만 만들 수 있도록 조건 추가
-    const usersLedger = await models.Ledger.findByPk(userId);
+    let ledger;
 
-    if (usersLedger) {
-      if (!usersLedger.is_shared) {
-        return {
-          status: 404,
-          message: "가게부가 이미 있습니다.",
-        };
-      }
-    } else {
-      const ledger = await models.Ledger.create({
-        name: name,
-        is_shared: is_shared,
-        userId: userId,
+    if (!is_shared) {
+      // 개인 가계부는 1개만 허용
+      const existingPersonalLedger = await models.Ledger.findOne({
+        where: { userId, is_shared: false },
       });
 
-      // 공유 가계부 생성 시 해당 소유주를 owner로 멤버에 추가
-      if (ledger.is_shared) {
-        await models.LedgerMember.create({
-          ledgerId: ledger.id,
-          userId,
-          role: "owner",
-        });
+      if (existingPersonalLedger) {
+        return {
+          status: 400,
+          message: "개인 가계부가 이미 존재합니다.",
+        };
       }
+
+      ledger = await models.Ledger.create({
+        name,
+        is_shared: false,
+        userId,
+      });
+    } else {
+      // 공유 가계부는 여러 개 가능
+      ledger = await models.Ledger.create({
+        name,
+        is_shared: true,
+        userId,
+      });
+
+      await models.LedgerMember.create({
+        ledgerId: ledger.id,
+        userId,
+        role: "owner",
+      });
     }
 
     return { status: 200, message: "가계부가 만들어졌습니다.", data: ledger };
@@ -180,23 +188,25 @@ const validateUserAndLedger = async (userId, ledgerId) => {
     };
   }
 
-  if (ledgerId !== null && ledgerId !== undefined) {
-    const ledger = await models.Ledger.findOne({ where: { id: ledgerId } });
+  if (ledgerId) {
+    if (ledgerId !== null && ledgerId !== undefined) {
+      const ledger = await models.Ledger.findOne({ where: { id: ledgerId } });
 
-    if (!ledger) {
-      return {
-        success: false,
-        status: 404,
-        message: "가계부를 찾을 수 없습니다.",
-      };
-    }
+      if (!ledger) {
+        return {
+          success: false,
+          status: 404,
+          message: "가계부를 찾을 수 없습니다.",
+        };
+      }
 
-    if (ledger.userId !== userId) {
-      return {
-        success: false,
-        status: 404,
-        message: "가계부에 접근할 권한이 없습니다.",
-      };
+      if (ledger.userId !== userId) {
+        return {
+          success: false,
+          status: 404,
+          message: "가계부에 접근할 권한이 없습니다.",
+        };
+      }
     }
   }
 
