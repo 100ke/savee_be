@@ -1,23 +1,62 @@
 const models = require("../models");
 
+// 개인 가게부 ledgerId 가져오기
+const getPersonalLedger = async (userId) => {
+  try {
+    const { success, status, message } = await validateUserAndLedger(userId);
+    if (!success) return { status, message };
+
+    const ledger = await models.Ledger.findOne({
+      where: { userId, is_shared: false },
+    });
+
+    if (!ledger) {
+      return {
+        status: 404,
+        message: "개인 가계부가 없습니다. ",
+      };
+    }
+
+    return {
+      status: 200,
+      message: "개인 가계부를 불러왔습니다.",
+      data: ledger,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 const createLedger = async (name, is_shared, userId) => {
   try {
     const { success, status, message } = await validateUserAndLedger(userId);
     if (!success) return { status, message };
 
-    const ledger = await models.Ledger.create({
-      name: name,
-      is_shared: is_shared,
-      userId: userId,
-    });
+    // 개인 가계부는 무조건 하나만 만들 수 있도록 조건 추가
+    const usersLedger = await models.Ledger.findByPk(userId);
 
-    // 공유 가계부 생성 시 해당 소유주를 owner로 멤버에 추가
-    if (ledger.is_shared) {
-      await models.LedgerMember.create({
-        ledgerId: ledger.id,
-        userId,
-        role: "owner",
+    if (usersLedger) {
+      if (!usersLedger.is_shared) {
+        return {
+          status: 404,
+          message: "가게부가 이미 있습니다.",
+        };
+      }
+    } else {
+      const ledger = await models.Ledger.create({
+        name: name,
+        is_shared: is_shared,
+        userId: userId,
       });
+
+      // 공유 가계부 생성 시 해당 소유주를 owner로 멤버에 추가
+      if (ledger.is_shared) {
+        await models.LedgerMember.create({
+          ledgerId: ledger.id,
+          userId,
+          role: "owner",
+        });
+      }
     }
 
     return { status: 200, message: "가계부가 만들어졌습니다.", data: ledger };
@@ -58,18 +97,19 @@ const updateLedger = async (userId, name, ledgerId) => {
   }
 };
 
+// 공유 가계부만 가져오기
 const getLedgers = async (userId) => {
   try {
     const { success, status, message } = await validateUserAndLedger(userId);
     if (!success) return { status, message };
 
     const ledgers = await models.Ledger.findAll({
-      where: { userId },
+      where: { userId, is_share: true },
     });
 
     return {
       status: 200,
-      message: "가계부 목록을 가져왔습니다.",
+      message: "공유 가계부 목록을 가져왔습니다.",
       data: ledgers,
     };
   } catch (error) {
@@ -77,6 +117,7 @@ const getLedgers = async (userId) => {
   }
 };
 
+// 공유 가계부만 삭제
 const deleteLedger = async (userId, ledgerId) => {
   try {
     const { success, status, message } = await validateUserAndLedger(
@@ -86,7 +127,7 @@ const deleteLedger = async (userId, ledgerId) => {
     if (!success) return { status, message };
 
     const ledger = await models.Ledger.findOne({
-      where: { id: ledgerId },
+      where: { userId, id: ledgerId, is_shared: true },
     });
 
     if (ledger.userId == userId) {
@@ -168,4 +209,5 @@ module.exports = {
   getLedgers,
   deleteLedger,
   findLedger,
+  getPersonalLedger,
 };
