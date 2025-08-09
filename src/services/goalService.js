@@ -41,6 +41,18 @@ const addGoals = async (
       start_date = `${yyyy}-${mm}-${dd}`;
     }
 
+    const isGoal = await models.Goal.findOne({
+      where: { ledgerId },
+    });
+
+    if (isGoal) {
+      return {
+        success: false,
+        statusCode: 404,
+        message: "이미 해당 가계부에 목표가 설정되어 있습니다.",
+      };
+    }
+
     const goal = await models.Goal.create({
       userId,
       ledgerId,
@@ -293,20 +305,6 @@ const validateUserAndLedger = async (userId, ledgerId, goalId, categoryId) => {
         success: false,
         statusCode: 404,
         message: "카테고리를 찾을 수 없습니다.",
-      };
-    }
-  }
-
-  if (goalId && categoryId) {
-    const goal = await models.Goal.findOne({
-      where: { ledgerId, categoryId },
-    });
-
-    if (goal) {
-      return {
-        success: false,
-        statusCode: 404,
-        message: "이미 해당 카테고리에 목표가 설정되어 있습니다.",
       };
     }
   }
