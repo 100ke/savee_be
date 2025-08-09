@@ -112,7 +112,7 @@ const getLedgers = async (userId) => {
     if (!success) return { status, message };
 
     const ledgers = await models.Ledger.findAll({
-      where: { userId, is_share: true },
+      where: { userId, is_shared: true },
     });
 
     return {
