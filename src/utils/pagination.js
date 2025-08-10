@@ -1,0 +1,43 @@
+const { Op } = require("sequelize");
+
+async function paginate(model, query, options = {}) {
+  // query: req.query (page, pageSize, keyword 등)
+  // options: 추가 where 조건 등
+  const page = parseInt(query.page, 10) || 1;
+  const pageSize = parseInt(query.pageSize, 10) || 10;
+  const offset = (page - 1) * pageSize;
+
+  // 키워드 검색 조건 처리
+  let whereCondition = options.where || {};
+  if (query.keyword) {
+    whereCondition = {
+      ...whereCondition,
+      title: { [Op.like]: `%${query.keyword}%` },
+    };
+  }
+
+  // 총 개수 조회
+  const totalItems = await model.count({ where: whereCondition });
+
+  // 데이터 조회
+  const items = await model.findAll({
+    where: whereCondition,
+    limit: pageSize,
+    offset,
+    order: options.order || [["createdAt", "DESC"]],
+    ...options.findAllOptions, // 추가 옵션 전달 가능
+  });
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+  return {
+    items,
+    pagination: {
+      currentPage: page,
+      pageSize,
+      totalItems,
+      totalPages,
+    },
+  };
+}
+
+module.exports = paginate;
