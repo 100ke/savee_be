@@ -15,6 +15,9 @@ const seedCategories = async () => {
     { id: 9, name: "편의점" },
     { id: 10, name: "교통" },
     { id: 11, name: "이체" },
+    { id: 12, name: "월급" },
+    { id: 13, name: "용돈" },
+    { id: 14, name: "기타 부수입" },
   ];
 
   for (const category of categories) {
