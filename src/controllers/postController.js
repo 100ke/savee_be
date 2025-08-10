@@ -20,11 +20,17 @@ const findAllPost = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 10; // limit
   const offset = (page - 1) * pageSize;
+  const keyword = req.query.keyword || "";
 
-  const totalPosts = await models.SupportPost.count();
+  const whereCondition = keyword
+    ? { title: { [Op.like]: `%${keyword}%` } }
+    : {};
+  const totalPosts = await models.SupportPost.count({ where: whereCondition });
   const posts = await models.SupportPost.findAll({
+    where: whereCondition,
     limit: pageSize,
     offset: offset,
+    order: [["createdAt", "DESC"]],
   });
   const totalPages = Math.ceil(totalPosts / pageSize);
   res.status(200).json({
@@ -69,23 +75,6 @@ const updatePost = async (req, res) => {
       .json({ message: "게시글 수정이 완료되었습니다.", data: post });
   } else {
     res.status(404).json({ message: "게시글이 없습니다." });
-  }
-};
-
-//게시글 제목 조회
-const findPostByName = async (req, res) => {
-  const keyword = req.params.keyword;
-  const posts = await models.SupportPost.findAll({
-    where: {
-      title: {
-        [Op.like]: `%${keyword}%`,
-      },
-    },
-  });
-  if (posts) {
-    res.status(200).json({ message: "게시글 검색 결과 입니다.", data: posts });
-  } else {
-    res.status(500).json({ message: "게시글이 없습니다.", error });
   }
 };
 
