@@ -112,12 +112,12 @@ const getLedgers = async (userId) => {
     if (!success) return { status, message };
 
     const ledgers = await models.Ledger.findAll({
-      where: { userId, is_shared: true },
+      where: { userId },
     });
 
     return {
       status: 200,
-      message: "공유 가계부 목록을 가져왔습니다.",
+      message: "가계부 목록을 가져왔습니다.",
       data: ledgers,
     };
   } catch (error) {
