@@ -156,6 +156,34 @@ const deleteLedger = async (userId, ledgerId) => {
   }
 };
 
+const getSharedLedgersByMembership = async (userId) => {
+  try {
+    const { success, status, message } = await validateUserAndLedger(userId);
+    if (!success) return { status, message };
+
+    const member = await models.LedgerMember.findAll({
+      where: { userId },
+      include: [
+        {
+          model: models.Ledger,
+          as: "ledger_ledgermembers",
+          where: { is_shared: true },
+        },
+      ],
+    });
+
+    const ledgers = member.map((entry) => entry.ledger_ledgermembers);
+
+    return {
+      status: 200,
+      message: "참여 중인 공유 가계부 목록을 가져왔습니다.",
+      data: ledgers,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 const findLedger = async (userId, ledgerId) => {
   try {
     const { success, status, message } = await validateUserAndLedger(
@@ -220,4 +248,5 @@ module.exports = {
   deleteLedger,
   findLedger,
   getPersonalLedger,
+  getSharedLedgersByMembership,
 };
