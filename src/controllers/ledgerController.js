@@ -97,7 +97,24 @@ const getPersonalLedger = async (req, res) => {
       .json({ message: result.message, data: result.data });
   } catch (error) {
     const status = error.status || 500;
-    const message = error.message || "개인 가게부를 불러오지 못했습니다.";
+    const message = error.message || "개인 가계부를 불러오지 못했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
+// 가계부 멤버가 자신이 참여한 공유 가계부의 목록 조회
+const getSharedLedgersByMembership = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const result = await ledgerService.getSharedLedgersByMembership(userId);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
+  } catch (error) {
+    const status = error.status || 500;
+    const message =
+      error.message || "참여중인 공유 가계부 목록을 불러오지 못했습니다.";
     res.status(status).json({ error: message });
   }
 };
@@ -109,4 +126,5 @@ module.exports = {
   deleteLedger,
   findLedger,
   getPersonalLedger,
+  getSharedLedgersByMembership,
 };
