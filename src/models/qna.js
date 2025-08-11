@@ -18,14 +18,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       qna_type: {
         type: DataTypes.ENUM(
-          "login",
-          "ledger",
-          "analysis",
-          "error",
-          "user",
-          "etc"
+          "로그인",
+          "가계부",
+          "소비분석",
+          "에러",
+          "유저",
+          "기타"
         ),
-        defaultValue: "login",
+        defaultValue: "로그인",
         allowNull: false,
       },
       iscompleted: {
