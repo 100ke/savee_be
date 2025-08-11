@@ -86,10 +86,27 @@ const findLedger = async (req, res) => {
   }
 };
 
+// 개인 가계부 ledgerId 가져오기
+const getPersonalLedger = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const result = await ledgerService.getPersonalLedger(userId);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "개인 가게부를 불러오지 못했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
 module.exports = {
   createLedger,
   updateLedger,
   getLedgers,
   deleteLedger,
   findLedger,
+  getPersonalLedger,
 };

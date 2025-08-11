@@ -118,32 +118,47 @@ const getComments = async (userId, ledgerId, commentId, date) => {
             as: "user_transactions",
             attributes: ["id", "name"],
           },
+          {
+            model: models.Category,
+            as: "category_transactions",
+            attributes: ["name"],
+          },
         ],
       });
     } else {
       transactions = await models.Transaction.findAll({
         where: { ledgerId, date },
-        incldue: [
+        include: [
           {
             model: models.User,
             as: "user_transactions",
             attributes: ["id", "name"],
           },
+          {
+            model: models.Category,
+            as: "category_transactions",
+            attributes: ["name"],
+          },
         ],
       });
     }
-
-    // 날짜별 댓글 가져오기
-    const tcomments = [];
 
     // 같은 날짜에 대한 댓글 한번에 모으기
     // 수입/지출 내역에서 날짜(transac.date)를 추출하고, 중복을 제거한 배열 -> 특정 날짜의 댓글 가져오기
     const commentDates = [...new Set(transactions.map((ts) => ts.date))];
 
+    if (commentDates.length === 0) {
+      return {
+        status: 404,
+        message: "해당 조건에 맞는 내역이 없습니다.",
+      };
+    }
+
     const comments = await models.Comment.findAll({
       where: { ledgerId, comment_date: commentDates },
       include: [
         { model: models.User, as: "user_comments", attributes: ["id", "name"] },
+        { model: models.Ledger, as: "ledger_comments", attributes: ["name"] },
       ],
     });
 
@@ -182,73 +197,44 @@ const getComments = async (userId, ledgerId, commentId, date) => {
         group[cm.comment_date].comments.push(cm);
       }
     }
+    // 유저별로 날짜에 따른 내역과 댓글 그룹화
+    // 최종 결과 배열로 반환
+    const result = [];
 
-    // 유저별 그룹핑
-    const userGroup = {};
-
-    // 날짜별로 거래 내역과 댓글을 유저별로 그룹화
     for (const date in group) {
-      for (const transac of group[date].transactions) {
-        const userId = transac.userId;
+      const dateEntry = group[date];
+      const userMap = {};
 
-        if (!userGroup[userId]) {
-          userGroup[userId] = {
+      // 거래 내역 기준 유저 그룹화
+      for (const transac of dateEntry.transactions) {
+        const uid = transac.userId;
+        if (!userMap[uid]) {
+          userMap[uid] = {
             user: transac.user_transactions,
-            dates: {},
-          };
-        }
-
-        if (!userGroup[userId].dates[date]) {
-          userGroup[userId].dates[date] = {
             transactions: [],
             comments: [],
           };
         }
+        userMap[uid].transactions.push(transac);
+      }
 
-        // 유저별 내역 추가
-        userGroup[userId].dates[date].transactions.push(transac);
-
-        // 유저별 댓글 추가
-        const userComments = group[date].comments.filter(
-          (ucm) => ucm.comment_date === date && ucm.userId === userId
-        );
-
-        // 중복된 댓글 추가하지 않도록 확인
-        for (const comment of userComments) {
-          if (
-            !userGroup[userId].dates[date].comments.some(
-              (c) => c.id === comment.id
-            )
-          ) {
-            // 유저별 댓글 추가
-            userGroup[userId].dates[date].comments.push(...userComments);
-          }
+      // 댓글 기준 유저 그룹화
+      for (const cm of dateEntry.comments) {
+        const uid = cm.userId;
+        if (!userMap[uid]) {
+          userMap[uid] = {
+            user: cm.user_comments,
+            transactions: [],
+            comments: [],
+          };
         }
-      }
-    }
-
-    // 최종 결과 배열로 반환
-    const result = [];
-
-    // 유저별로 날짜에 따른 내역과 댓글 그룹화
-    for (const userId in userGroup) {
-      const userObj = userGroup[userId];
-      const userResult = {
-        user: userObj.user,
-        dates: [],
-      };
-
-      for (const date in userObj.dates) {
-        const dateObj = userObj.dates[date];
-
-        userResult.dates.push({
-          date,
-          transactions: dateObj.transactions,
-          comments: dateObj.comments,
-        });
+        userMap[uid].comments.push(cm);
       }
 
-      result.push(userResult);
+      result.push({
+        date,
+        users: Object.values(userMap),
+      });
     }
 
     return {
