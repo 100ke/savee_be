@@ -12,16 +12,38 @@ router.get(
 );
 
 router.get(
+  "/categories/expenses",
+  authenticate,
+  checkPersonalLedger,
+  statisticController.getGroupedExpenses
+);
+
+router.get(
   "/trend/total/monthly",
   authenticate,
   checkPersonalLedger,
   statisticController.getMonthlyTotalExpensing
 );
+
+router.get(
+  "/trend/total/monthly/expenses/:year/:month",
+  authenticate,
+  checkPersonalLedger,
+  statisticController.getMonthlyExpensesList
+);
+
 router.get(
   "/trend/total/weekly",
   authenticate,
   checkPersonalLedger,
   statisticController.getWeeklyTotalExpensing
+);
+
+router.get(
+  "/trend/total/weekly/expenses",
+  authenticate,
+  checkPersonalLedger,
+  statisticController.getWeeklyExpensesList
 );
 
 router.get(

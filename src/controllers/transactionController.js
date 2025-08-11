@@ -160,7 +160,7 @@ const getWeeklyTransactions = async (req, res) => {
 const getMonthlyCalendarTransactions = async (req, res) => {
   const userId = req.user.id;
   const ledgerId = req.params.ledgerId;
-  let month;
+  let month = req.query.month;
 
   try {
     const result = await transactionService.getMonthlyCalendarTransactions(

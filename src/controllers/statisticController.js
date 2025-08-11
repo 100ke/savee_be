@@ -67,9 +67,81 @@ const getLast7DaysExpensing = async (req, res) => {
   }
 };
 
+// 카테고리별 지출 내역 조회
+const getGroupedExpenses = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const ledgerId = req.personalLedger.id;
+    const type = req.query.type;
+
+    const result = await statisticService.getGroupedExpenses({
+      userId,
+      ledgerId,
+      type,
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    const status = error.status || 500;
+    const message =
+      error.message || "카테고리별 지출 내역 조회 중 오류가 발생했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
+// 월간 지출 내역 조회
+const getMonthlyExpensesList = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const ledgerId = req.personalLedger.id;
+    const { year, month } = req.params;
+    const y = Number(year);
+    const m = Number(month);
+
+    if (!y || !m || m < 1 || m > 12) {
+      return res
+        .status(400)
+        .json({ message: "올바른 연도와 월을 입력하세요." });
+    }
+    const expenses = await statisticService.getMonthlyExpensesList(
+      userId,
+      ledgerId,
+      y,
+      m
+    );
+    res.status(200).json({ expenses });
+  } catch (error) {
+    const status = error.status || 500;
+    const message =
+      error.message || "월별 지출 내역 조회 중 오류가 발생했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
+// 주간 지출 내역 조회
+const getWeeklyExpensesList = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const ledgerId = req.personalLedger.id;
+
+    const weeklyExpenses = await statisticService.getWeeklyExpensesList(
+      userId,
+      ledgerId
+    );
+    res.status(200).json({ weeklyExpenses });
+  } catch (error) {
+    const status = error.status || 500;
+    const message =
+      error.message || "주별 지출 내역 조회 중 오류가 발생했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
 module.exports = {
   getCategoryExpensing,
   getMonthlyTotalExpensing,
   getWeeklyTotalExpensing,
   getLast7DaysExpensing,
+  getGroupedExpenses,
+  getMonthlyExpensesList,
+  getWeeklyExpensesList,
 };

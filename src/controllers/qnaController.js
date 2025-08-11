@@ -1,5 +1,6 @@
 const models = require("../models");
 const { Op } = require("sequelize");
+const paginate = require("../utils/pagination");
 
 //질문 추가
 const createQna = async (req, res) => {
@@ -40,10 +41,17 @@ const updateQna = async (req, res) => {
 };
 //질문 전체 조회
 const findAllQna = async (req, res) => {
-  const qnas = await models.Qna.findAll();
-  return res
-    .status(200)
-    .json({ message: "전체 질문 목록을 조회 합니다.", data: qnas });
+  try {
+    const { items: data, pagination } = await paginate(models.Qna, req.query);
+
+    return res.status(200).json({
+      message: "전체 질문 목록을 조회 합니다.",
+      data: { data, pagination },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
 };
 
 //질문 id 조회

@@ -1,6 +1,6 @@
 const models = require("../models");
 const { Op } = require("sequelize");
-
+const paginate = require("../utils/pagination");
 //게시글 추가(only admin)
 const createPost = async (req, res) => {
   const { title, content, post_type } = req.body;
@@ -15,30 +15,21 @@ const createPost = async (req, res) => {
     .json({ message: "게시글이 등록되었습니다.", data: supportPost });
 };
 
-//게시글 전체 조회
+//게시글 조회
 const findAllPost = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 10; // limit
-  const offset = (page - 1) * pageSize;
-
-  const totalPosts = await models.SupportPost.count();
-  const posts = await models.SupportPost.findAll({
-    limit: pageSize,
-    offset: offset,
-  });
-  const totalPages = Math.ceil(totalPosts / pageSize);
-  res.status(200).json({
-    message: "전체 게시글 목록을 조회 합니다.",
-    data: {
-      posts,
-      pagination: {
-        currentPage: page,
-        pageSize,
-        totalItems: totalPosts,
-        totalPages,
-      },
-    },
-  });
+  try {
+    const { items: data, pagination } = await paginate(
+      models.SupportPost,
+      req.query
+    );
+    res.status(200).json({
+      message: "전체 게시글 목록을 조회 합니다.",
+      data: { data, pagination },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 오류가 발생했습니다." });
+  }
 };
 //게시글 id로 조회
 const findPostById = async (req, res) => {
@@ -72,23 +63,6 @@ const updatePost = async (req, res) => {
   }
 };
 
-//게시글 제목 조회
-const findPostByName = async (req, res) => {
-  const keyword = req.params.keyword;
-  const posts = await models.SupportPost.findAll({
-    where: {
-      title: {
-        [Op.like]: `%${keyword}%`,
-      },
-    },
-  });
-  if (posts) {
-    res.status(200).json({ message: "게시글 검색 결과 입니다.", data: posts });
-  } else {
-    res.status(500).json({ message: "게시글이 없습니다.", error });
-  }
-};
-
 //게시글 삭제(only admin)
 const deletePost = async (req, res) => {
   const id = req.params.id;
@@ -103,7 +77,6 @@ module.exports = {
   createPost,
   findAllPost,
   findPostById,
-  findPostByName,
   updatePost,
   deletePost,
 };
