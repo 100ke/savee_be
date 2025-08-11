@@ -3,6 +3,12 @@ const router = express.Router();
 const ledgerController = require("../controllers/ledgerController");
 const { authenticate } = require("../middlewares/authMiddleware");
 
+router.get(
+  "/membership",
+  authenticate,
+  ledgerController.getSharedLedgersByMembership
+);
+
 router.get("/personal", authenticate, ledgerController.getPersonalLedger);
 router.post("/", authenticate, ledgerController.createLedger);
 router.put("/:ledgerId", authenticate, ledgerController.updateLedger);
