@@ -11,13 +11,13 @@ router.patch(
   answerController.addAnswer
 );
 router.patch(
-  "/:id/answer",
+  "/:id/answer/delete",
   authenticate,
   adminOnly,
   answerController.deleteAnswer
 );
 router.patch(
-  "/:id/answer",
+  "/:id/answer/update",
   authenticate,
   adminOnly,
   answerController.updateAnswer
