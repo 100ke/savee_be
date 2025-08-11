@@ -15,8 +15,9 @@ const {
 } = require("../utils/statHelper");
 const { getTransactions } = require("./transactionService");
 
-// 카테고리별 지출 통계
-const getCategoryExpensing = async ({ userId, ledgerId, type }) => {
+// 카테고리별 지출 통계 관련 함수 리팩토링
+// 기간 내 지출 필터링
+const getExpensesByPeriod = async ({ userId, ledgerId, type }) => {
   // 1. 기준 기간 구하기 (주간/월간)
   let year, unitValue;
   if (type === "weekly") {
@@ -34,42 +35,67 @@ const getCategoryExpensing = async ({ userId, ledgerId, type }) => {
   }
   const { start, end } = getDateRange(type, year, unitValue);
   // 2. 기간 내에 포함되는 지출 데이터 필터링
-  // getTransactions 함수에 category 조인해야함 (민아님 수정 예정)
-  const response = await getTransactions(userId, ledgerId); // 고쳐야할 코드
+  // getTransactions 함수에 category 조인
+  const response = await getTransactions(userId, ledgerId);
 
   const data = response.data || [];
   const expenses = data.filter((item) => item.type === "expense");
-  const filtered = filterByDateRange(expenses, start, end);
+  return filterByDateRange(expenses, start, end);
+};
+
+// 카테고리별 지출 내역
+const getGroupedExpenses = async (params) => {
+  const expenses = await getExpensesByPeriod(params);
   // 3. 카테고리별로 그룹화
-  const groupedData = await groupByCategory(filtered);
+  return groupByCategory(expenses);
+};
+
+// 카테고리별 지출 통계
+const getCategoryExpensing = async (params) => {
+  const groupedData = await getGroupedExpenses(params);
 
   // 4. 카테고리별 총합 계산
-  const groupByTotal = await sumByCategory(groupedData);
+  const groupByTotal = sumByCategory(groupedData);
 
   // 5. 포맷 정리 및 반환
   return groupByTotal;
-  // 클라이언트에서 카테고리 이름, 금액 정렬, 퍼센트 등 추가 정보 필요하면 여기서 가공.
 };
 
 // 지출 추이 - 1. 총합 추이
 // 1-1. 월간 총합 추이
-const getMonthlyTotalExpensing = async (userId, ledgerId) => {
-  const { year, month: currentMonth } = getCurrentMonthInfo();
-  const monthlyTotal = [];
+
+// 월간 지출 내역을 가져오는 함수로 분리
+const getMonthlyExpensesList = async (userId, ledgerId, year, month) => {
   // 수입 지출 목록 조회
   const response = await getTransactions(userId, ledgerId);
   const data = response.data || [];
   // 지출 항목 필터링
   const expenses = data.filter((item) => item.type === "expense");
+
+  // 월 단위 시작일과 종료일 계산
+  const { start, end } = getDateRange("monthly", year, month);
+  // 기간 내 필터링
+  const filtered = filterByDateRange(expenses, start, end);
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return filtered; // 해당 월의 지출 목록 배열 반환
+};
+
+// 월간 지출 총합
+const getMonthlyTotalExpensing = async (userId, ledgerId) => {
+  const { year, month: currentMonth } = getCurrentMonthInfo();
+  const monthlyTotal = [];
+
   // 1. 올해의 1월부터 현재까지 반복
   for (let monthIndex = 1; monthIndex <= currentMonth; monthIndex++) {
-    // 2. 월 단위 시작일과 종료일 계산
-    const { start, end } = getDateRange("monthly", year, monthIndex);
-    // 3. 각 월의 데이터 조회 + 총합 계산
-    const filtered = filterByDateRange(expenses, start, end);
-    // console.log({ start, end, filteredLength: filtered.length });
+    // 2. 월간 지출 내역 조회
+    const expenses = await getMonthlyExpensesList(
+      userId,
+      ledgerId,
+      year,
+      monthIndex
+    );
     let total = 0;
-    filtered.forEach((element) => {
+    expenses.forEach((element) => {
       total += element.amount;
     });
     monthlyTotal.push({ month: monthIndex, total });
@@ -78,7 +104,9 @@ const getMonthlyTotalExpensing = async (userId, ledgerId) => {
 };
 
 // 1-2. 주간 총합 추이
-const getWeeklyTotalExpensing = async (userId, ledgerId) => {
+
+// 주간 지출 내역을 가져오는 함수로 분리
+const getWeeklyExpensesList = async (userId, ledgerId) => {
   const { year, month: currentMonth } = getCurrentMonthInfo();
 
   // 1. 지출 데이터 조회
@@ -94,7 +122,7 @@ const getWeeklyTotalExpensing = async (userId, ledgerId) => {
     return { ...expense.dataValues, week };
   });
 
-  // 3. 주차별 데이터 필터링
+  // 3. 주차별 데이터 그룹핑
   const groupByWeek = expensesWithWeek.reduce((acc, curr) => {
     // acc: 누적값, curr: 현재 처리중인 expense
     const week = curr.week;
@@ -104,11 +132,29 @@ const getWeeklyTotalExpensing = async (userId, ledgerId) => {
     acc[week].push(curr);
     return acc;
   }, {});
-  // 4. 주차별 총합 계산 -> 지출 내역 없는 주차는 total=0
-  const weeklySum = weeksInMonth.map((week) => {
-    const transactions = groupByWeek[week] || [];
-    const total = transactions.reduce(
-      (sum, t) => sum + (Number(t.amount) || 0),
+  // 4. 이번달의 모든 주차에 대한 지출 내역 배열 반환
+  const weeklyExpenses = weeksInMonth.map((week) => {
+    const expensesForWeek = groupByWeek[week] || [];
+    expensesForWeek.sort((a, b) => {
+      return dayjs(b.date).valueOf() - dayjs(a.date).valueOf();
+    });
+
+    return {
+      week,
+      expenses: expensesForWeek,
+    };
+  });
+
+  return weeklyExpenses;
+};
+
+// 주간 지출 총합
+const getWeeklyTotalExpensing = async (userId, ledgerId) => {
+  const weeklyExpenses = await getWeeklyExpensesList(userId, ledgerId);
+  // 5. 주차별 총합 계산 -> 지출 내역 없는 주차는 total=0
+  const weeklySum = weeklyExpenses.map(({ week, expenses }) => {
+    const total = expenses.reduce(
+      (sum, item) => sum + (Number(item.amount) || 0),
       0
     );
     return {
@@ -160,8 +206,12 @@ const getLast7DaysExpensing = async (userId) => {
 };
 
 module.exports = {
+  getExpensesByPeriod,
+  getGroupedExpenses,
   getCategoryExpensing,
+  getMonthlyExpensesList,
   getMonthlyTotalExpensing,
+  getWeeklyExpensesList,
   getWeeklyTotalExpensing,
   getLast7DaysExpensing,
 };
