@@ -168,6 +168,21 @@ const getSharedLedgersByMembership = async (userId) => {
           model: models.Ledger,
           as: "ledger_ledgermembers",
           where: { is_shared: true },
+          include: [
+            { model: models.Goal, as: "ledger_goals" },
+            { model: models.Budget, as: "ledger_budgets" },
+            {
+              model: models.LedgerMember,
+              as: "ledger_ledgermembers",
+              include: [
+                {
+                  model: models.User,
+                  as: "user_ledgermembers",
+                  attributes: ["id", "name", "email"],
+                },
+              ],
+            },
+          ],
         },
       ],
     });
