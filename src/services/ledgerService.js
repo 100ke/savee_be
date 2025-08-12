@@ -209,6 +209,26 @@ const findLedger = async (userId, ledgerId) => {
 
     const ledger = await models.Ledger.findOne({
       where: { id: ledgerId },
+      include: [
+        {
+          model: models.LedgerMember,
+          as: "ledger_ledgermembers",
+          include: [
+            {
+              model: models.User,
+              as: "user_ledgermembers",
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+        { model: models.Goal, as: "ledger_goals" },
+        { model: models.Budget, as: "ledger_budgets" },
+        {
+          model: models.User,
+          as: "user_ledgers",
+          attributes: ["id", "name", "email"],
+        },
+      ],
     });
 
     if (ledger.userId == userId) {

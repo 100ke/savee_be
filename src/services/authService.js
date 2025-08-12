@@ -7,6 +7,11 @@ const { Op } = require("sequelize");
 
 // 회원가입을 위한 인증번호 이메일 발송
 const verifyEmail = async (email) => {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const error = new Error("유효하지 않은 이메일 주소입니다.");
+    error.status = 400;
+    throw error;
+  }
   const user = await models.User.findOne({
     where: { email: email },
   });
@@ -62,7 +67,7 @@ const verifyCode = async (email, enteredCode) => {
 
   if (verifyInfo.code !== enteredCode) {
     const error = new Error("인증번호가 일치하지 않습니다.");
-    error.status = 401;
+    error.status = 422;
     throw error;
   }
   // 사용되었거나 만료된 코드인지 확인
