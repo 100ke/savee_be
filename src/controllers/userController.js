@@ -14,7 +14,8 @@ const changePassword = async (req, res) => {
   } catch (error) {
     const status = error.status || 500;
     const message = error.message || "비밀번호 변경 중 오류가 발생했습니다.";
-    res.status(status).json({ error: message });
+    const code = error.code || "UNKNOWN_ERROR";
+    res.status(status).json({ error: message, code });
   }
 };
 
