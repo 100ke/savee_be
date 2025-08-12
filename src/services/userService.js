@@ -19,6 +19,13 @@ const changePassword = async (userId, currentPassword, newPassword) => {
     error.status = 401;
     throw error;
   }
+  const isSameAsCurrent = await bcrypt.compare(newPassword, user.password);
+  if (isSameAsCurrent) {
+    const error = new Error("비밀번호 변경에 실패했습니다.");
+    error.status = 400;
+    error.code = "PASSWORD_SAME";
+    throw error;
+  }
   const hashedNewPw = await bcrypt.hash(newPassword, 10);
   user.password = hashedNewPw;
   await user.save();
@@ -30,6 +37,13 @@ const changeName = async (userId, name) => {
   if (!user) {
     const error = new Error("사용자를 찾을 수 없습니다.");
     error.status = 404;
+    throw error;
+  }
+  if (user.name === name) {
+    const error = new Error(
+      "기존 이름과 동일합니다. 새로운 이름을 입력해주세요."
+    );
+    error.status = 400;
     throw error;
   }
   user.name = name;
