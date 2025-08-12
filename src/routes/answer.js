@@ -5,19 +5,19 @@ const { adminOnly } = require("../middlewares/adminMiddleware");
 const answerController = require("../controllers/answerController");
 
 router.patch(
-  "/:id/answer",
+  "/:id",
   authenticate,
   adminOnly,
   answerController.addAnswer
 );
 router.patch(
-  "/:id/answer/delete",
+  "/:id/delete",
   authenticate,
   adminOnly,
   answerController.deleteAnswer
 );
 router.patch(
-  "/:id/answer/update",
+  "/:id/update",
   authenticate,
   adminOnly,
   answerController.updateAnswer
