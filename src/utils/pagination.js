@@ -10,10 +10,12 @@ async function paginate(model, query, options = {}) {
   // 키워드 검색 조건 처리
   let whereCondition = options.where || {};
   if (query.keyword) {
-    whereCondition = {
-      ...whereCondition,
-      title: { [Op.like]: `%${query.keyword}%` },
-    };
+    whereCondition.title = { [Op.like]: `%${query.keyword}%` };
+  }
+
+  // qna_type이 빈 문자열이면 필터 안 함
+  if (query.qna_type && query.qna_type.trim() !== "") {
+    whereCondition.qna_type = query.qna_type.trim();
   }
 
   // 총 개수 조회
