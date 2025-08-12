@@ -39,10 +39,20 @@ const updateQna = async (req, res) => {
     return res.status(404).json({ message: "질문이 없습니다." });
   }
 };
-//질문 전체 조회
 const findAllQna = async (req, res) => {
   try {
-    const { items: data, pagination } = await paginate(models.Qna, req.query);
+    // req.query.qna_type가 빈 문자열이라면 조건에 안 넣음
+    const options = {};
+
+    if (req.query.qna_type && req.query.qna_type.trim() !== "") {
+      options.where = { qna_type: req.query.qna_type.trim() };
+    }
+
+    const { items: data, pagination } = await paginate(
+      models.Qna,
+      req.query,
+      options
+    );
 
     return res.status(200).json({
       message: "전체 질문 목록을 조회 합니다.",
