@@ -8,11 +8,11 @@ const addAnswer = async (req, res) => {
   const qna = await models.Qna.findByPk(id);
 
   if (qna) {
-    if (qna.iscompleted == true) {
-      return res
-        .status(400)
-        .json({ message: "이미 답변이 등록 된 질문입니다." });
-    }
+    // if (qna.iscompleted == true) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "이미 답변이 등록 된 질문입니다." });
+    // }
     if (!answer || answer.trim() == "") {
       res.status(400).json({ message: "빈 답변은 등록 할 수 없습니다." });
     } else {
