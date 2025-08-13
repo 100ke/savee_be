@@ -21,6 +21,13 @@ router.get(
   transactionController.getMonthlyCalendarTransactions
 );
 
+// 목표(카테고리 + 기간)에 부합하는 수입/지출 내역
+router.get(
+  "/goals-progress",
+  authenticate,
+  transactionController.getGoalsTransactions
+);
+
 router.post("/", authenticate, transactionController.addTransactions);
 router.get("/", authenticate, transactionController.getTransactions);
 router.get(
