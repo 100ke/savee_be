@@ -136,6 +136,31 @@ const getWeeklyExpensesList = async (req, res) => {
   }
 };
 
+// 카테고리별 통계 데이터 적용
+// const updateCategoryStats = async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+//     const ledgerId = req.personalLedger.id;
+//     const type = req.query.type;
+//     if (!["weekly", "monthly"].includes(type)) {
+//       return res
+//         .status(400)
+//         .json({ error: "타입은 'weekly' 또는 'monthly'만 가능합니다." });
+//     }
+//     const result = await statisticService.updateCategoryStats({
+//       userId,
+//       ledgerId,
+//       type,
+//     });
+//     res.status(200).json({ message: "통계 데이터 갱신 완료", data: result });
+//   } catch (error) {
+//     const status = error.status || 500;
+//     const message =
+//       error.message || "카테고리 별 통계 데이터 처리 중 오류가 발생했습니다.";
+//     res.status(status).json({ error: message });
+//   }
+// };
+
 module.exports = {
   getCategoryExpensing,
   getMonthlyTotalExpensing,
@@ -144,4 +169,5 @@ module.exports = {
   getGroupedExpenses,
   getMonthlyExpensesList,
   getWeeklyExpensesList,
+  // updateCategoryStats,
 };
