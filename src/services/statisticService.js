@@ -7,6 +7,7 @@ const {
   getISOWeeksOfMonth,
   dayjs,
   getLast7Days,
+  getLastMonthDateRange,
 } = require("../utils/dateHelper");
 const {
   filterByDateRange,
@@ -225,6 +226,29 @@ const getLast7DaysExpensing = async (userId) => {
   return result;
 };
 
+// 소비 분석용 데이터 추출
+// 지난 달 데이터를 가져오기 위한 기간 지정 지출 조회 함수 생성
+const getExpensesByCustomPeriod = async ({ userId, ledgerId, start, end }) => {
+  const response = await getTransactions(userId, ledgerId);
+  const data = response.data || [];
+  const expenses = data.filter((item) => item.type === "expense");
+  return filterByDateRange(expenses, start, end);
+};
+
+// 지난 달 카테고리별 지출 구하기
+const getLastMonthCategoryExpensing = async ({ userId, ledgerId }) => {
+  // 지난달의 시작/끝 날짜 계산
+  const { start, end } = getLastMonthDateRange();
+  const expenses = await getExpensesByCustomPeriod({
+    userId,
+    ledgerId,
+    start,
+    end,
+  });
+  const grouped = groupByCategory(expenses);
+  return sumByCategory(grouped);
+};
+
 module.exports = {
   getExpensesByPeriod,
   getGroupedExpenses,
@@ -235,4 +259,6 @@ module.exports = {
   getWeeklyTotalExpensing,
   getLast7DaysExpensing,
   // updateCategoryStats,
+  getExpensesByCustomPeriod,
+  getLastMonthCategoryExpensing,
 };
