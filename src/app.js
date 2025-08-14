@@ -17,6 +17,7 @@ const answerRouter = require("./routes/answer");
 const commentRouter = require("./routes/comment");
 const goalRouter = require("./routes/goal");
 const statsRouter = require("./routes/statistic");
+const analysisRouter = require("./routes/analysis");
 
 const { sequelize } = require("./models");
 const {
@@ -58,6 +59,7 @@ app.use("/answer", answerRouter);
 app.use("/ledgers/:ledgerId/comments", commentRouter);
 app.use("/ledgers/:ledgerId/goals", goalRouter);
 app.use("/statistics", statsRouter);
+app.use("/analysis", analysisRouter);
 
 // 서버 실행
 const PORT = process.env.PORT || 3000;

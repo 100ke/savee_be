@@ -181,13 +181,12 @@ const getMonthlyCalendarTransactions = async (req, res) => {
 const getGoalsTransactions = async (req, res) => {
   const userId = req.user.id;
   const ledgerId = req.params.ledgerId;
-  const { categoryId, start_date, end_date } = req.query;
+  const { start_date, end_date } = req.query;
 
   try {
     const result = await transactionService.getGoalsTransactions(
       userId,
       ledgerId,
-      categoryId,
       start_date,
       end_date
     );
