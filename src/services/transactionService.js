@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const models = require("../models");
+const dayjs = require("dayjs");
 
 const addTransactions = async (
   userId,
@@ -397,6 +398,65 @@ const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
   }
 };
 
+const getGoalsTransactions = async (
+  userId,
+  ledgerId,
+  categoryId,
+  start_date,
+  end_date
+) => {
+  try {
+    if (
+      !dayjs(start_date, "YYYY-MM-DD", true).isValid() ||
+      !dayjs(end_date, "YYYY-MM-DD", true).isValid()
+    ) {
+      return {
+        status: 400,
+        message: "날짜 형식이 잘못되었습니다. YYYY-MM-DD 형식이어야 합니다.",
+      };
+    }
+
+    const stDate = dayjs(start_date).format("YYYY-MM-DD");
+    const edDate = dayjs(end_date).format("YYYY-MM-DD");
+
+    const { success, status, message } = await vaildateUserAndLedger(
+      userId,
+      ledgerId
+    );
+    if (!success) return { status, message };
+
+    const transactions = await models.Transaction.findAll({
+      where: {
+        ledgerId,
+        categoryId,
+        date: {
+          [Op.between]: [stDate, edDate],
+        },
+      },
+      include: [{ model: models.Category, as: "category_transactions" }],
+    });
+
+    const totalIncome = transactions
+      .filter((ts) => ts.type === "income")
+      .reduce((sum, trs) => sum + trs.amount, 0);
+
+    // expense는 음수로 변환
+    const totalExpense = transactions
+      .filter((ts) => ts.type === "expense")
+      .reduce((sum, trs) => sum - trs.amount, 0);
+
+    const summary = totalIncome + totalExpense;
+
+    return {
+      status: 200,
+      message: "해당 가계부의 목표에 들어가는 수입/지출 내역을 가져왔습니다.",
+      data: { transactions, totalIncome, totalExpense, summary },
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 const vaildateUserAndLedger = async (userId, ledgerId, transactionId) => {
   const user = await models.User.findByPk(userId);
 
@@ -460,4 +520,5 @@ module.exports = {
   getDailyTransactions,
   getWeeklyTransactions,
   getMonthlyCalendarTransactions,
+  getGoalsTransactions,
 };
