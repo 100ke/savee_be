@@ -53,4 +53,12 @@ router.get(
   statisticController.getLast7DaysExpensing
 );
 
+// 카테고리별 지출 총합 데이터 업데이트 용
+// router.post(
+//   "/categories/stats",
+//   authenticate,
+//   checkPersonalLedger,
+//   statisticController.updateCategoryStats
+// );
+
 module.exports = router;

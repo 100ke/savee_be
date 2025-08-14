@@ -178,6 +178,29 @@ const getMonthlyCalendarTransactions = async (req, res) => {
   }
 };
 
+const getGoalsTransactions = async (req, res) => {
+  const userId = req.user.id;
+  const ledgerId = req.params.ledgerId;
+  const { categoryId, start_date, end_date } = req.query;
+
+  try {
+    const result = await transactionService.getGoalsTransactions(
+      userId,
+      ledgerId,
+      categoryId,
+      start_date,
+      end_date
+    );
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
+  } catch (error) {
+    const status = error.status || 500;
+    const message = error.message || "월간 가계부를 불러오지 못했습니다.";
+    res.status(status).json(message);
+  }
+};
+
 module.exports = {
   addTransactions,
   getTransactions,
@@ -187,4 +210,5 @@ module.exports = {
   getDailyTransactions,
   getWeeklyTransactions,
   getMonthlyCalendarTransactions,
+  getGoalsTransactions,
 };
