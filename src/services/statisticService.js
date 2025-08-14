@@ -61,6 +61,26 @@ const getCategoryExpensing = async (params) => {
   return groupByTotal;
 };
 
+// 카테고리별 지출 통계 데이터베이스 반영
+// const updateCategoryStats = async ({ userId, ledgerId, type }) => {
+//   let currentWeek, currentMonth;
+//   const weekInfo = getCurrentWeekInfo();
+//   currentWeek = weekInfo.year;
+//   const monthInfo = getCurrentMonthInfo();
+//   currentMonth = monthInfo.month;
+//   const groupedData = await getCategoryExpensing({ userId, ledgerId, type });
+//   for (const category of groupedData) {
+//     await models.CategoryStatistics.upsert({
+//       userId,
+//       ledgerId,
+//       categoryId: category.id,
+//       week: type === "weekly" ? currentWeek : null,
+//       month: type === "monthly" ? currentMonth : null,
+//       totalAmount: category.totalAmount,
+//     });
+//   }
+// };
+
 // 지출 추이 - 1. 총합 추이
 // 1-1. 월간 총합 추이
 
@@ -214,4 +234,5 @@ module.exports = {
   getWeeklyExpensesList,
   getWeeklyTotalExpensing,
   getLast7DaysExpensing,
+  // updateCategoryStats,
 };
