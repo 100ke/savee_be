@@ -398,13 +398,7 @@ const getMonthlyCalendarTransactions = async (userId, ledgerId, month) => {
   }
 };
 
-const getGoalsTransactions = async (
-  userId,
-  ledgerId,
-  categoryId,
-  start_date,
-  end_date
-) => {
+const getGoalsTransactions = async (userId, ledgerId, start_date, end_date) => {
   try {
     if (
       !dayjs(start_date, "YYYY-MM-DD", true).isValid() ||
@@ -428,7 +422,6 @@ const getGoalsTransactions = async (
     const transactions = await models.Transaction.findAll({
       where: {
         ledgerId,
-        categoryId,
         date: {
           [Op.between]: [stDate, edDate],
         },
