@@ -67,6 +67,18 @@ const getLast7Days = () => {
   return last7Days;
 };
 
+// 지난달 년,월 정보 구하기
+const getLastMonthInfo = () => {
+  const lastMonth = dayjs().subtract(1, "month");
+  return { year: lastMonth.year(), month: lastMonth.month() + 1 };
+};
+
+// 지난달 시작,끝 날짜 구하기
+const getLastMonthDateRange = () => {
+  const { year, month } = getLastMonthInfo();
+  return getDateRange("monthly", year, month);
+};
+
 module.exports = {
   dayjs,
   getCurrentMonthInfo,
@@ -74,4 +86,6 @@ module.exports = {
   getDateRange,
   getISOWeeksOfMonth,
   getLast7Days,
+  getLastMonthInfo,
+  getLastMonthDateRange,
 };
