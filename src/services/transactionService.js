@@ -436,7 +436,7 @@ const getGoalsTransactions = async (userId, ledgerId, start_date, end_date) => {
     // expense는 음수로 변환
     const totalExpense = transactions
       .filter((ts) => ts.type === "expense")
-      .reduce((sum, trs) => sum - trs.amount, 0);
+      .reduce((sum, trs) => sum + trs.amount, 0);
 
     const summary = totalIncome + totalExpense;
 
