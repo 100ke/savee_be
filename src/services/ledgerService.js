@@ -231,7 +231,10 @@ const findLedger = async (userId, ledgerId) => {
       ],
     });
 
-    if (ledger.userId == userId) {
+    if (
+      ledger.userId === userId ||
+      ledger.ledger_ledgermembers?.some((m) => m.userId === userId)
+    ) {
       return { status: 200, message: "가계부를 가져왔습니다.", data: ledger };
     } else {
       return { status: 404, message: "가계부에 접근할 권한이 없습니다." };
@@ -295,7 +298,10 @@ const validateUserAndLedger = async (userId, ledgerId) => {
 
   if (ledgerId) {
     if (ledgerId !== null && ledgerId !== undefined) {
-      const ledger = await models.Ledger.findOne({ where: { id: ledgerId } });
+      const ledger = await models.Ledger.findOne({
+        where: { id: ledgerId },
+        include: [{ model: models.LedgerMember, as: "ledger_ledgermembers" }],
+      });
 
       if (!ledger) {
         return {
@@ -305,11 +311,16 @@ const validateUserAndLedger = async (userId, ledgerId) => {
         };
       }
 
-      if (ledger.userId !== userId) {
+      const isOwner = ledger.userId === userId;
+      const isMember = ledger.ledger_ledgermembers?.some(
+        (member) => member.userId === userId
+      );
+
+      if (!isOwner && !isMember) {
         return {
           success: false,
-          status: 404,
-          message: "가계부에 접근할 권한이 없습니다.",
+          status: 403,
+          message: "가계부에 접근 권한이 없습니다.",
         };
       }
     }

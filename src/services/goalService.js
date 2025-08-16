@@ -278,7 +278,7 @@ const validateUserAndLedger = async (userId, ledgerId, goalId, categoryId) => {
   // 만약 공유 가계부라면 멤버인지 소유주인지 확인
   if (ledger.is_shared) {
     const isMember = await models.LedgerMember.findOne({
-      where: { ledgerId, id: userId },
+      where: { ledgerId, userId },
     });
 
     if (!isMember) {
@@ -289,13 +289,13 @@ const validateUserAndLedger = async (userId, ledgerId, goalId, categoryId) => {
       };
     }
 
-    if (isMember.role === "member") {
-      return {
-        success: false,
-        statusCode: 404,
-        message: "공유 가계부의 목표는 소유주가 설정할 수 있습니다.",
-      };
-    }
+    // if (isMember.role === "member") {
+    //   return {
+    //     success: false,
+    //     statusCode: 404,
+    //     message: "공유 가계부의 목표는 소유주가 설정할 수 있습니다.",
+    //   };
+    // }
   }
 
   if (categoryId) {
