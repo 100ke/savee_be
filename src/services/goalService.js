@@ -200,7 +200,8 @@ const updateGoal = async (
       if (start_date) newGoal.start_date = start_date;
       if (end_date) newGoal.end_date = end_date;
       if (type) newGoal.type = type;
-      if (status) newGoal.status = status;
+      if (status !== undefined && newGoal.status !== status)
+        newGoal.status = status;
       if (categoryId) newGoal.categoryId = categoryId;
     }
 
