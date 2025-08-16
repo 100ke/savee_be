@@ -463,7 +463,9 @@ const vaildateUserAndLedger = async (userId, ledgerId, transactionId) => {
   }
 
   // 해당 가계부가 맞는지 권한 검증
-  const ledger = await models.Ledger.findByPk(ledgerId);
+  const ledger = await models.Ledger.findByPk(ledgerId, {
+    include: [{ model: models.LedgerMember, as: "ledger_ledgermembers" }],
+  });
 
   if (!ledger) {
     return {
@@ -474,10 +476,16 @@ const vaildateUserAndLedger = async (userId, ledgerId, transactionId) => {
   }
 
   // 둘 중 하나라도 권한이 없으면 가계부에 접근 못 하도록 설정
-  if (!ledger || ledger.userId !== userId) {
+  // 개인 가계부 소유자이거나, ledgerMember로 등록되어 있어야 접근 가능
+  const isOwner = ledger.userId === userId;
+  const isMember = ledger.ledger_ledgermembers?.some(
+    (member) => member.userId === userId
+  );
+
+  if (!isOwner && !isMember) {
     return {
       success: false,
-      status: 404,
+      status: 403,
       message: "가계부에 접근할 권한이 없습니다.",
     };
   }
