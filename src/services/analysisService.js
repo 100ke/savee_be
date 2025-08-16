@@ -108,19 +108,13 @@ const getStrategy = async ({ summary }) => {
       각 항목을 json 배열 형식으로 나눠서 반환해주세요.
       {
         "tips" : [
-          {"item1": "string", "description": "string"},
-          {"item2": "string", "description": "string"},
-          {"item3": "string", "description": "string"},
+          {"item": "string", "description": "string"},
         ],
         "cautions": [
-          {"item1": "string", "description": "string"},
-          {"item2": "string", "description": "string"},
-          {"item3": "string", "description": "string"},
+          {"item": "string", "description": "string"},
         ],
         "positiveHabits": [
-          {"item1": "string", "description": "string"},
-          {"item2": "string", "description": "string"},
-          {"item3": "string", "description": "string"},
+          {"item": "string", "description": "string"},
         ],
       }
   `;
