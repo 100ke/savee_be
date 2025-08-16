@@ -96,7 +96,7 @@ const getStrategy = async ({ summary }) => {
   }
   const strategyPrompt = `
     다음은 우리 소비분석 가계부 사용자의 이번 달 소비 요약 입니다. :
-    ${summary}
+    ${JSON.stringify(summary)}
 
     위 소비 패턴을 분석하여 아래 사항을 제안해 주세요.
       1. 절약할 수 있는 구체적인 전략 3가지
@@ -104,9 +104,35 @@ const getStrategy = async ({ summary }) => {
       3. 긍정적인 소비 습관
       - 제안은 이해하기 쉽게 작성하고, 한국어로 작성해주세요.
       - 너무 추상적이지 않게 실제 생활에서 적용 가능한 팁을 제공해주세요.
+
+      각 항목을 json 배열 형식으로 나눠서 반환해주세요.
+      {
+        "tips" : [
+          {"item1": "string", "description": "string"},
+          {"item2": "string", "description": "string"},
+          {"item3": "string", "description": "string"},
+        ],
+        "cautions": [
+          {"item1": "string", "description": "string"},
+          {"item2": "string", "description": "string"},
+          {"item3": "string", "description": "string"},
+        ],
+        "positiveHabits": [
+          {"item1": "string", "description": "string"},
+          {"item2": "string", "description": "string"},
+          {"item3": "string", "description": "string"},
+        ],
+      }
   `;
   const result = await chatGPT(strategyPrompt);
-  return { strategy: result };
+  let parsedResult;
+  try {
+    parsedResult = JSON.parse(result);
+  } catch (error) {
+    console.error("JSON 파싱 실패: ", error);
+    parsedResult = { error: "결과 파싱 실패", raw: result };
+  }
+  return { strategy: parsedResult };
 };
 
 module.exports = { getSummary, getStrategy };
