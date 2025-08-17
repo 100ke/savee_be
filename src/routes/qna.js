@@ -9,7 +9,7 @@ router.delete("/:id", authenticate, qnaController.deleteQna);
 
 router.get("/", qnaController.findAllQna);
 router.get("/search", qnaController.findBytitle);
-router.get("/my", qnaController.findMyqna);
+router.get("/my", authenticate, qnaController.findMyqna);
 router.get("/:id", qnaController.findByid);
 
 module.exports = router;
