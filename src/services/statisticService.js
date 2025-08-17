@@ -47,8 +47,12 @@ const getExpensesByPeriod = async ({ userId, ledgerId, type }) => {
 // 카테고리별 지출 내역
 const getGroupedExpenses = async (params) => {
   const expenses = await getExpensesByPeriod(params);
+  // 최신순 정렬 (date 기준 내림차순)
+  const sortedExpenses = expenses.sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
   // 3. 카테고리별로 그룹화
-  return groupByCategory(expenses);
+  return groupByCategory(sortedExpenses);
 };
 
 // 카테고리별 지출 통계

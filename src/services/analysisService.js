@@ -35,7 +35,7 @@ const getSummary = async (userId, ledgerId) => {
 
     summaryText 필드는 다음 기준으로 작성:
     1. 자연스러운 스토리텔링 문장으로 작성
-    2. 입력 데이터 전반(groupedData, lastMonthGroupedData, monthlyTrendData, weeklyTrendData, last7DaysData)을 참고
+    2. 입력 데이터 전반(groupedData, lastMonthGroupedData, monthlyTrendData, weeklyTrendData, last7DaysData)을 참고하여 다방면으로 분석
     3. 이번 달 소비 패턴, 변화, 눈에 띄는 특징, 주별 흐름 등을 풍부하게 서술
     4. 숫자는 JSON 필드(biggestChange, totalChange, maxSpendingDay)에서 계산된 값을 그대로 반영
     5. 불필요한 설명이나 추정 숫자는 포함하지 않음
