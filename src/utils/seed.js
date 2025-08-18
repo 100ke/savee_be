@@ -1,4 +1,10 @@
-const { Category, User, Ledger, Transaction } = require("../models");
+const {
+  Category,
+  User,
+  Ledger,
+  Transaction,
+  SupportPost,
+} = require("../models");
 const bcrypt = require("bcrypt");
 
 //카테고리
@@ -861,4 +867,242 @@ const seedLedgerAndTransactions = async () => {
   }
 };
 
-module.exports = { seedCategories, seedUsers, seedLedgerAndTransactions };
+const seedSupport = async () => {
+  try {
+    const supports = [
+      {
+        title: "서비스 점검 안내 (8월 5일)",
+        content:
+          "8월 5일 오전 2시부터 4시까지 서비스 점검이 예정되어 있습니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "신규 기능 출시 안내",
+        content: "새로운 소비 분석 기능이 추가되었습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "자주 묻는 질문 모음",
+        content: "고객님들이 자주 묻는 질문을 모았습니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "8월 휴무 안내",
+        content: "8월 15일 광복절은 고객센터가 운영되지 않습니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "버그 수정 공지",
+        content: "가계부 통계 오류가 수정되었습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "회원 등급별 혜택 안내",
+        content: "프리미엄 회원에게 제공되는 혜택을 안내합니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "서비스 이용약관 개정 안내",
+        content: "2025년 8월 1일부터 약관이 변경됩니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "데이터 백업 안내",
+        content: "월말 정기 백업 작업이 진행됩니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "공유 가계부 사용법",
+        content: "공유 가계부를 시작하는 방법을 알아보세요.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "고객센터 운영시간 변경 안내",
+        content: "운영시간이 오전 9시부터 오후 6시로 변경됩니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "알림 기능 개선 안내",
+        content: "불필요한 알림을 줄이고, 맞춤형 알림을 제공합니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "앱 버전 업데이트 안내",
+        content: "최신 앱 버전을 마켓에서 다운로드하세요.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "소비 트렌드 분석 가이드",
+        content: "지난달 소비 트렌드를 확인하는 방법을 소개합니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "이벤트 종료 안내",
+        content: "7월 여름 이벤트가 종료되었습니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "앱 속도 개선 공지",
+        content: "로딩 속도가 최대 2배 빨라졌습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "FAQ 업데이트",
+        content: "최근 자주 묻는 질문을 반영해 FAQ를 수정했습니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "정기 점검 예고 (9월)",
+        content: "9월 1일 자정부터 정기 점검이 예정되어 있습니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "앱 알림 설정 방법",
+        content: "알림을 끄거나 키는 방법을 확인하세요.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "데이터 복구 지원 안내",
+        content: "실수로 삭제한 데이터를 복구하는 방법을 안내합니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "서비스 안정화 작업 안내",
+        content: "더 나은 서비스를 위한 내부 점검이 있습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "소비 카테고리 추가 안내",
+        content: "새로운 소비 카테고리를 선택할 수 있게 되었습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "가계부 백업 기능 안내",
+        content: "가계부 내보내기 기능을 사용할 수 있습니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "추석 연휴 운영 안내",
+        content: "추석 기간 동안 고객센터 운영시간이 변경됩니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "계정 보안 강화 안내",
+        content: "2단계 인증 기능이 추가되었습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "데이터 삭제 유의사항",
+        content: "데이터 삭제 시 복구가 어렵습니다. 주의해주세요.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "이메일 수신 설정 변경 안내",
+        content: "원하지 않는 메일은 수신거부가 가능합니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "공지사항 탭 위치 변경 안내",
+        content: "메뉴 내 공지사항 위치가 변경되었습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "회원 탈퇴 전 확인사항",
+        content: "탈퇴 전 확인해야 할 내용을 안내합니다.",
+        post_type: "가이드",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "이벤트 당첨자 발표",
+        content: "이벤트에 참여해주셔서 감사합니다.",
+        post_type: "공지",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        title: "업데이트 내역 정리",
+        content: "8월 업데이트 주요 내용을 정리했습니다.",
+        post_type: "업데이트",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    for (const post of supports) {
+      await SupportPost.findOrCreate({
+        where: {
+          title: post.title,
+          content: post.content,
+          post_type: post.post_type,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+        },
+      });
+    }
+    console.log("공지사항 시드 완료");
+  } catch (error) {
+    console.error("❌ 시드 함수 실행 중 에러 발생:", error);
+  }
+};
+
+module.exports = {
+  seedCategories,
+  seedUsers,
+  seedLedgerAndTransactions,
+  seedSupport,
+};

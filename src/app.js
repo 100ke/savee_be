@@ -24,6 +24,7 @@ const {
   seedCategories,
   seedUsers,
   seedLedgerAndTransactions,
+  seedSupport,
 } = require("./utils/seed");
 
 const app = express();
@@ -31,8 +32,8 @@ const app = express();
 // CORS 설정
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    // origin: "https://polite-dune-0f3b9e800.2.azurestaticapps.net",
+    // origin: "http://localhost:3000",
+    origin: "https://polite-dune-0f3b9e800.2.azurestaticapps.net",
     credentials: true,
   })
 );
@@ -73,6 +74,7 @@ app.listen(PORT, () => {
       await seedCategories();
       await seedUsers();
       await seedLedgerAndTransactions();
+      await seedSupport();
       console.log(`db connect`);
     })
     .catch((err) => {
