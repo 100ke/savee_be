@@ -32,8 +32,8 @@ const app = express();
 // CORS 설정
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    // origin: "https://polite-dune-0f3b9e800.2.azurestaticapps.net",
+    // origin: "http://localhost:3000",
+    origin: "https://polite-dune-0f3b9e800.2.azurestaticapps.net",
     credentials: true,
   })
 );
@@ -69,11 +69,10 @@ app.listen(PORT, () => {
   console.log(`${PORT}번 포트에서 서버 실행 중`);
 
   models.sequelize
-    .sync({ force: true })
+    .sync({ force: false })
     .then(async () => {
       await seedCategories();
       await seedUsers();
-      await seedLedgerAndTransactions();
       await seedLedgerAndTransactions();
       await seedSupport();
       console.log(`db connect`);
