@@ -105,6 +105,12 @@ const signup = async (email, name, password) => {
       name: name,
       password: hashedPw,
     });
+
+    await models.Ledger.create({
+      name: `${name}의 가계부`,
+      userId: user.id,
+    });
+
     return {
       message: `${user.name}님 회원가입에 성공했습니다.`,
       user: { id: user.id, email },
