@@ -140,6 +140,7 @@ const login = async (email, password) => {
   return {
     message: `로그인 성공. ${user.name}님 환영합니다!`,
     accessToken: accessToken,
+    user: { id: user.id },
   };
 };
 
