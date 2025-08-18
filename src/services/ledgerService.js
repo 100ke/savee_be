@@ -231,11 +231,56 @@ const findLedger = async (userId, ledgerId) => {
       ],
     });
 
-    if (ledger.userId == userId) {
+    if (
+      ledger.userId === userId ||
+      ledger.ledger_ledgermembers?.some((m) => m.userId === userId)
+    ) {
       return { status: 200, message: "가계부를 가져왔습니다.", data: ledger };
     } else {
       return { status: 404, message: "가계부에 접근할 권한이 없습니다." };
     }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getAllAccessLedgers = async (userId) => {
+  try {
+    const { success, status, message } = await validateUserAndLedger(userId);
+    if (!success) return { status, message };
+
+    // 개인 및 본인이 소유한 공유 가계부
+    const ownedLedgers = await models.Ledger.findAll({ where: { userId } });
+
+    // 멤버로 참여중인 공유 가게부
+    const memberLedger = await models.LedgerMember.findAll({
+      where: { userId },
+      include: [
+        {
+          model: models.Ledger,
+          as: "ledger_ledgermembers",
+          where: { is_shared: true },
+        },
+      ],
+    });
+
+    const sharedLedgers = memberLedger.map(
+      (ledger) => ledger.ledger_ledgermembers
+    );
+
+    // 중복 제거 (본인이 소유 + 멤버인 경우)
+    const allLedgers = new Map();
+    [...ownedLedgers, ...sharedLedgers].forEach((ledger) => {
+      allLedgers.set(ledger.id, ledger);
+    });
+
+    const ledgerResult = Array.from(allLedgers.values());
+
+    return {
+      status: 200,
+      message: "접근 가능한 모든 가게부를 가져왔습니다.",
+      data: ledgerResult,
+    };
   } catch (error) {
     throw error;
   }
@@ -253,7 +298,10 @@ const validateUserAndLedger = async (userId, ledgerId) => {
 
   if (ledgerId) {
     if (ledgerId !== null && ledgerId !== undefined) {
-      const ledger = await models.Ledger.findOne({ where: { id: ledgerId } });
+      const ledger = await models.Ledger.findOne({
+        where: { id: ledgerId },
+        include: [{ model: models.LedgerMember, as: "ledger_ledgermembers" }],
+      });
 
       if (!ledger) {
         return {
@@ -263,11 +311,16 @@ const validateUserAndLedger = async (userId, ledgerId) => {
         };
       }
 
-      if (ledger.userId !== userId) {
+      const isOwner = ledger.userId === userId;
+      const isMember = ledger.ledger_ledgermembers?.some(
+        (member) => member.userId === userId
+      );
+
+      if (!isOwner && !isMember) {
         return {
           success: false,
-          status: 404,
-          message: "가계부에 접근할 권한이 없습니다.",
+          status: 403,
+          message: "가계부에 접근 권한이 없습니다.",
         };
       }
     }
@@ -284,4 +337,5 @@ module.exports = {
   findLedger,
   getPersonalLedger,
   getSharedLedgersByMembership,
+  getAllAccessLedgers,
 };

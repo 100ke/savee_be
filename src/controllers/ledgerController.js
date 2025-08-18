@@ -119,6 +119,24 @@ const getSharedLedgersByMembership = async (req, res) => {
   }
 };
 
+// 개인 가계부 + 참여중인 공유 가계부 모두 조회
+const getAllAccessLedgers = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const result = await ledgerService.getAllAccessLedgers(userId);
+    res
+      .status(result.status)
+      .json({ message: result.message, data: result.data });
+  } catch (error) {
+    const status = error.status || 500;
+    const message =
+      error.message ||
+      "현재 소유하거나 참여중인 가계부 목록을 불러오지 못했습니다.";
+    res.status(status).json({ error: message });
+  }
+};
+
 module.exports = {
   createLedger,
   updateLedger,
@@ -127,4 +145,5 @@ module.exports = {
   findLedger,
   getPersonalLedger,
   getSharedLedgersByMembership,
+  getAllAccessLedgers,
 };
