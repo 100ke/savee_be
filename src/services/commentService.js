@@ -144,7 +144,7 @@ const getComments = async (userId, ledgerId, commentId, date) => {
       const lastDate = new Date(year, month, 1);
       const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
       const endDate = lastDate.toISOString().split("T")[0];
-      console.log(startDate, endDate);
+
       transactions = await models.Transaction.findAll({
         where: {
           ledgerId,
