@@ -16,7 +16,7 @@ const changePassword = async (userId, currentPassword, newPassword) => {
   const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch) {
     const error = new Error("기존 비밀번호를 다시 확인해주세요.");
-    error.status = 401;
+    error.status = 400;
     throw error;
   }
   const isSameAsCurrent = await bcrypt.compare(newPassword, user.password);
