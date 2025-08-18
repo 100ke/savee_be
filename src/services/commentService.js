@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const models = require("../models");
 
 // 댓글 추가
@@ -124,10 +125,33 @@ const getComments = async (userId, ledgerId, commentId, date) => {
             attributes: ["name"],
           },
         ],
+        order: [["date", "DESC"]],
       });
     } else {
+      const [yearStr, monthStr] = date.split("-");
+      const year = Number(yearStr);
+      const month = Number(monthStr);
+
+      // 날짜 유효성 검사
+      if (!year || !month || month < 1 || month > 12) {
+        return {
+          status: 400,
+          message: "유효하지 않은 날짜 형식입니다. (YYYY-MM)",
+        };
+      }
+
+      // month는 0부터 시작 → 다음 달의 0일 = 이번 달 마지막 날
+      const lastDate = new Date(year, month, 1);
+      const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+      const endDate = lastDate.toISOString().split("T")[0];
+      console.log(startDate, endDate);
       transactions = await models.Transaction.findAll({
-        where: { ledgerId, date },
+        where: {
+          ledgerId,
+          date: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
         include: [
           {
             model: models.User,
@@ -140,6 +164,7 @@ const getComments = async (userId, ledgerId, commentId, date) => {
             attributes: ["name"],
           },
         ],
+        order: [["date", "DESC"]],
       });
     }
 

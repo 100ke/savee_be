@@ -8,7 +8,7 @@ router.get(
   authenticate,
   ledgerController.getSharedLedgersByMembership
 );
-
+router.get("/all", authenticate, ledgerController.getAllAccessLedgers);
 router.get("/personal", authenticate, ledgerController.getPersonalLedger);
 router.post("/", authenticate, ledgerController.createLedger);
 router.put("/:ledgerId", authenticate, ledgerController.updateLedger);
