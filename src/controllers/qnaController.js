@@ -102,16 +102,23 @@ const findBytitle = async (req, res) => {
 //나의 질문 조회
 const findMyqna = async (req, res) => {
   const userId = req.user.id;
-  const qnas = await models.Qna.findAll({
-    where: { userId },
-    order: [["createdAt", "DESC"]],
-  });
-  if (!qnas || qnas.length === 0) {
+  const options = { userId };
+  const { items: data, pagination } = await paginate(
+    models.Qna,
+    req.query,
+    options
+  );
+  // const qnas = await models.Qna.findAll({
+  //   where: { userId },
+  //   order: [["createdAt", "DESC"]],
+  // });
+  if (!data || data.length === 0) {
     return res.status(200).json({ message: "검색 결과가 없습니다.", data: [] });
   }
-  return res
-    .status(200)
-    .json({ message: `내가 작성한 질문 목록 입니다.`, data: qnas });
+  return res.status(200).json({
+    message: `내가 작성한 질문 목록 입니다.`,
+    data: { data, pagination },
+  });
 };
 
 //질문 삭제(only 작성자, admin)
