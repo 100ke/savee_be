@@ -142,10 +142,12 @@ const getWeeklyExpensesList = async (userId, ledgerId) => {
   // 이번 달의 모든 iso 주차 번호
   const weeksInMonth = getISOWeeksOfMonth(year, currentMonth);
   // 지출 내역에 iso 주차 번호 부여
-  const expensesWithWeek = expenses.map((expense) => {
-    const week = dayjs(expense.date).isoWeek();
-    return { ...expense.dataValues, week };
-  });
+  const expensesWithWeek = expenses
+    .filter((expense) => dayjs(expense.date).month() === currentMonth - 1)
+    .map((expense) => {
+      const week = dayjs(expense.date).isoWeek();
+      return { ...expense.dataValues, week };
+    });
 
   // 3. 주차별 데이터 그룹핑
   const groupByWeek = expensesWithWeek.reduce((acc, curr) => {
