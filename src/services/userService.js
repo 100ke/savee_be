@@ -5,6 +5,7 @@ const {
   sendMail,
   generateTempPw,
 } = require("../utils/emailAuth");
+const { Op } = require("sequelize");
 
 const changePassword = async (userId, currentPassword, newPassword) => {
   const user = await models.User.findByPk(userId);
@@ -34,6 +35,12 @@ const changePassword = async (userId, currentPassword, newPassword) => {
 
 const changeName = async (userId, name) => {
   const user = await models.User.findByPk(userId);
+  // 이름에 공백 불가
+  if (/\s/.test(name)) {
+    const error = new Error("이름에 공백은 허용되지 않습니다.");
+    error.status = 400;
+    throw error;
+  }
   if (!user) {
     const error = new Error("사용자를 찾을 수 없습니다.");
     error.status = 404;
@@ -134,9 +141,33 @@ const deleteUser = async (userId, enteredEmail, enteredPassword) => {
   const isMatch = await bcrypt.compare(enteredPassword, user.password);
   if (!isMatch) {
     const error = new Error("비밀번호가 일치하지 않습니다.");
-    error.status = 401;
+    error.status = 400;
     throw error;
   }
+  // 공유 가계부에 속한 회원의 탈퇴 처리
+  // 1. 탈퇴하려는 유저가 소유한 (공유)가계부 조회
+  const ownedLedgers = await models.Ledger.findAll({ where: { userId } });
+
+  for (const ledger of ownedLedgers) {
+    // 소유주 위임할 멤버 찾기
+    const otherMembers = await models.LedgerMember.findAll({
+      where: { ledgerId: ledger.id, userId: { [Op.ne]: userId } },
+      // Op.ne : not equal 같지 않음 -> userId와 같지 않은 유저 조회
+    });
+    if (otherMembers.length > 0) {
+      // 다른 멤버가 있다면 첫 번째에 소유권 위임
+      const newOwner = otherMembers[0];
+      await ledger.update({ userId: newOwner.userId });
+    } else {
+      // 다른 멤버가 없으면 가계부 삭제
+      await ledger.destroy();
+    }
+  }
+  // 2. 가계부 멤버에서 해당 유저 삭제
+  await models.LedgerMember.destroy({
+    where: { userId },
+  });
+
   await models.User.destroy({
     where: { id: userId },
   });
