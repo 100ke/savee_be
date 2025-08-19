@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-
+const models = require("../models");
 async function paginate(model, query, options = {}) {
   // query: req.query (page, pageSize, keyword 등)
   // options: 추가 where 조건 등
@@ -26,7 +26,14 @@ async function paginate(model, query, options = {}) {
     where: whereCondition,
     limit: pageSize,
     offset,
-    order: options.order || [["createdAt", "DESC"]],
+    order: [["createdAt", "DESC"]],
+    include: [
+      {
+        model: models.User, // 관계 설정된 User 모델
+        as: "user",
+        attributes: ["name"], // 필요한 필드만
+      },
+    ],
     ...options.findAllOptions, // 추가 옵션 전달 가능
   });
 

@@ -69,11 +69,10 @@ app.listen(PORT, () => {
   console.log(`${PORT}번 포트에서 서버 실행 중`);
 
   models.sequelize
-    .sync({ force: true })
+    .sync({ force: false })
     .then(async () => {
       await seedCategories();
       await seedUsers();
-      await seedLedgerAndTransactions();
       await seedLedgerAndTransactions();
       await seedSupport();
       console.log(`db connect`);
