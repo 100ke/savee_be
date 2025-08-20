@@ -2,7 +2,16 @@ module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     "User",
     {
-      name: { type: DataTypes.STRING, allowNull: false },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          is: {
+            args: /^[^\s]+$/, // 공백 불가
+            msg: "이름에 공백은 허용되지 않습니다.",
+          },
+        },
+      },
       email: { type: DataTypes.STRING, allowNull: false, unique: true },
       password: { type: DataTypes.STRING, allowNull: false },
       role: {

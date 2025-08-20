@@ -102,7 +102,12 @@ const findBytitle = async (req, res) => {
 //나의 질문 조회
 const findMyqna = async (req, res) => {
   const userId = req.user.id;
-  const options = { userId };
+  const options = {
+    findAllOptions: {
+      where: { userId: req.user.id }, // 여기서 내 ID만 조건
+      order: [["createdAt", "DESC"]],
+    },
+  };
   const { items: data, pagination } = await paginate(
     models.Qna,
     req.query,

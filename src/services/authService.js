@@ -89,6 +89,12 @@ const verifyCode = async (email, enteredCode) => {
 
 const signup = async (email, name, password) => {
   try {
+    // 이름에 공백 불가
+    if (/\s/.test(name)) {
+      const error = new Error("이름에 공백은 허용되지 않습니다.");
+      error.status = 400;
+      throw error;
+    }
     // 이메일 인증 정보 먼저 확인
     const verifyInfo = await models.EmailVerification.findOne({
       where: { email: email },
