@@ -76,7 +76,7 @@ app.listen(PORT, () => {
       await seedCategories();
       await seedUsers();
       await seedLedgerAndTransactions();
-      await seedSupport();
+      // await seedSupport();
       console.log(`db connect`);
     })
     .catch((err) => {

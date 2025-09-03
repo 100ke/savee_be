@@ -516,7 +516,7 @@ const seedLedgerAndTransactions = async () => {
         date: "2025-07-20",
       },
 
-      // === 8월 지출 (8/20 이전) ===
+      // === 8월 지출 ===
       {
         ledgerId: ledger.id,
         userId: user.id,
@@ -804,6 +804,61 @@ const seedLedgerAndTransactions = async () => {
         amount: 65000,
         memo: "인터넷 요금",
         date: "2025-08-26",
+      },
+      // === 9월 첫째주 지출 ===
+      {
+        ledgerId: ledger.id,
+        userId: user.id,
+        type: "expense",
+        categoryId: 1,
+        amount: 12000,
+        memo: "점심 식사",
+        date: "2025-09-01",
+      },
+      {
+        ledgerId: ledger.id,
+        userId: user.id,
+        type: "expense",
+        categoryId: 5,
+        amount: 4800,
+        memo: "아이스 아메리카노",
+        date: "2025-09-02",
+      },
+      {
+        ledgerId: ledger.id,
+        userId: user.id,
+        type: "expense",
+        categoryId: 10,
+        amount: 2500,
+        memo: "버스비",
+        date: "2025-09-03",
+      },
+      {
+        ledgerId: ledger.id,
+        userId: user.id,
+        type: "expense",
+        categoryId: 4,
+        amount: 20000,
+        memo: "내과 진료",
+        date: "2025-09-04",
+      },
+      {
+        ledgerId: ledger.id,
+        userId: user.id,
+        type: "expense",
+        categoryId: 7,
+        amount: 50000,
+        memo: "의류 구매",
+        date: "2025-09-05",
+      },
+      {
+        ledgerId: ledger.id,
+        userId: user.id,
+        type: "expense",
+        categoryId: 8,
+        amount: 65000,
+        memo: "전기요금",
+        date: "2025-09-06",
       },
 
       // === 수입 ===
