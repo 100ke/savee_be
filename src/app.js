@@ -65,7 +65,7 @@ app.use("/statistics", statsRouter);
 app.use("/analysis", analysisRouter);
 
 // 서버 실행
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`${PORT}번 포트에서 서버 실행 중`);
