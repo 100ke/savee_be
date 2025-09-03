@@ -33,7 +33,9 @@ const app = express();
 app.use(
   cors({
     // origin: "http://localhost:3000",
-    origin: "https://polite-dune-0f3b9e800.2.azurestaticapps.net",
+    // origin: "https://polite-dune-0f3b9e800.2.azurestaticapps.net",
+    // synetics saveeFE
+    origin: "https://blue-cliff-00de25600.2.azurestaticapps.net",
     credentials: true,
   })
 );
